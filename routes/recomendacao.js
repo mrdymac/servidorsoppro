@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var  fcm = require ('fcm-notification') ; 
-var FCM = new fcm ('path/to/privatekey.json') ; 
+var FCM = new fcm ('privatekey.json') ; 
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
