@@ -44,6 +44,9 @@ router.get('/plano', function(req, res, next) {
   
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
+  Users.find({}).lean().exec(function (a,b){
+      console.log(b);
+  });
   Users.findOne({"email":e}).lean().exec(
     function (a,b){
       //checa validade (b.validade)
