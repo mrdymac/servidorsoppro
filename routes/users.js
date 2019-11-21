@@ -49,6 +49,7 @@ router.get('/plano', function(req, res, next) {
       //checa validade (b.validade)
       console.log(e);
       if(b==null)
+      res.send([]);
       return;
       checaValidade(b, Users);
       if(b.idPlano!=null && b.idPlano!=undefined && b.idPlano!="" ){
