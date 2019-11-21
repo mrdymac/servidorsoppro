@@ -36,5 +36,6 @@ var planoSchema=new mongoose.Schema({
     _id:Schema.Types.ObjectId,
     num_empresas: String,
     codigo: String
-});
+}, { collection: 'planos' }
+);
 module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema }
