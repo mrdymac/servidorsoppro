@@ -20,6 +20,23 @@ router.post("/signin",function(req,res){
       }
   });
 });
+router.post("/save",function(req,res){
+  var db = require("../db");
+  var e=req.body.email;
+  var tok=req.body.token;
+  var idNot=req.body.idNotification;
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.findOneAndUpdate({email:e},{token:tok,idNotification:idNot},function(e){
+     if (e) {
+          console.log("Error! " + err.message);
+          return err;
+      }
+      else {
+          console.log("Post saved");
+        res.send("[{\"ok\":\"saved\"}]");
+      }
+  });
+});
 
 router.get('/plano', function(req, res, next) {
   var db = require("../db");
@@ -30,6 +47,9 @@ router.get('/plano', function(req, res, next) {
   Users.findOne({email:e}).lean().exec(
     function (a,b){
       //checa validade (b.validade)
+      console.log(e);
+      if(users==null)
+      return;
       checaValidade(b, Users);
       if(b.idPlano!=null && b.idPlano!=undefined && b.idPlano!="" ){
         Planos.find({_id:b.idPlano}).lean().exec((c,plano)=>{
