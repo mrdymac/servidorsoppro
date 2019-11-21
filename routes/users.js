@@ -81,6 +81,8 @@ router.get('/plano', function(req, res, next) {
 });
 
 function checaValidade(userPlano, Model){
+  if(userPlano.validade==null)
+  return;
   var validade=new Date(userPlano.validade.substr(0,4),userPlano.validade.substr(4,2),userPlano.validade.substr(6,2));
   var hoje=Date.now();
   if(validade<hoje){
