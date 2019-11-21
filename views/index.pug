@@ -1,0 +1,11 @@
+extends layout
+
+block content
+ 
+  p Tatiana 
+ 
+  ul 
+    each val in userlist
+      li 
+        a(class="btn btn-primary")=val.token
+ 
