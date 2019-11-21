@@ -2,9 +2,9 @@
   "name": "soppro",
   "version": "1.0.0",
   "private": true,
-  "main": "app.js",
+
   "scripts": {
-    "start": "node app"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
