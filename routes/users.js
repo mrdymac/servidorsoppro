@@ -9,7 +9,7 @@ router.post("/signin",function(req,res){
   var tok=req.body.token;
   var idNot=req.body.idNotification;
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-  Users.findOneAndUpdate({email:e},{token:tok,idNotification:idNot},function(e){
+  Users.findOneAndUpdate({"email":e},{token:tok,idNotification:idNot},function(e){
      if (e) {
           console.log("Error! " + err.message);
           return err;
@@ -26,7 +26,7 @@ router.post("/save",function(req,res){
   var tok=req.body.token;
   var idNot=req.body.idNotification;
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-  Users.findOneAndUpdate({email:e},{token:tok,idNotification:idNot},function(e){
+  Users.findOneAndUpdate({"email":e},{token:tok,idNotification:idNot},function(e){
      if (e) {
           console.log("Error! " + err.message);
           return err;
@@ -44,7 +44,7 @@ router.get('/plano', function(req, res, next) {
   
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
-  Users.findOne({email:e}).lean().exec(
+  Users.findOne({"email":e}).lean().exec(
     function (a,b){
       //checa validade (b.validade)
       console.log(e);
