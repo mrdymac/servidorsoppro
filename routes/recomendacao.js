@@ -23,7 +23,7 @@ router.post('/save',function(req,res){
     var rec_data=req.body.dados_recomendacao;
     var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
     var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-    Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
+    
         var rec={
             _id:new mongo.ObjectId(),
             recomendacao:recom,
@@ -35,10 +35,7 @@ router.post('/save',function(req,res){
             dados_recomendacao:JSON.parse(rec_data),
             ticker:tic
        };
-       empresa.recomendacoes.push(rec);
-
-
-       Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{recomendacoes:empresa.recomendacoes},
+       Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$push:{recomendacoes:rec}},
         {upsert:true}, function(err, doc){
           if (err)
            return res.send(500, { error: err });
