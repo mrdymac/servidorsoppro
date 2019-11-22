@@ -12,9 +12,9 @@ var adminSchema = new mongoose.Schema({
 
 var empresasSchema = new mongoose.Schema({
     tickers: [{
-        codigo:double,
-        cotacoes:[{data:String, fechamento: double}],
-        dividendo:double
+        codigo: String,
+        cotacoes:[{data:String, fechamento: String}],
+        dividendo: String
     },
     {
 
