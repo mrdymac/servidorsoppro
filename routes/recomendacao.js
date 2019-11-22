@@ -100,7 +100,7 @@ router.get('/', function(req, res) {
                    texto:rec.texto,
                    dados_indicadores:rec.dados_indicadores,
                    ticker:rec.ticker,
-                   data: getDataFormatada(rec.data),
+                   data: rec.data,
                    disclaimer: rec.autor,
                    inicio_acomp: inicioAcomp.substr(8,2)+"/"+inicioAcomp.substr(5,2)+"/"+inicioAcomp.substr(0,4)
                };
