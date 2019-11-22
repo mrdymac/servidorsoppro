@@ -37,7 +37,7 @@ router.post('/ticker/save',function(req,res){
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
 // Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
       //empresa.tickers.push({codigo:cod,cotacoes:[]});
-      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$push:{tickers:{codigo:cod,cotacoes:[]}}},
+      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$push:{tickers:{codigo:cod,cotacoes:[],dividendos:[]}}},
              {upsert:true}, function(err, doc){
          if (err)
           return res.send(500, { error: err });
