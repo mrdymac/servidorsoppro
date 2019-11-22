@@ -49,7 +49,7 @@ router.post('/ticker/save',function(req,res){
 router.post('/ticker/dividendos/save',function(req,res){
    
       var db = require("../db");
-    // var id=req.body.empresa;
+      var id=req.body.empresa;
       var cod=req.body.codigo;
       var dat=req.body.data;
       var val=req.body.valor.replace(',','.');  
@@ -64,7 +64,7 @@ router.post('/ticker/dividendos/save',function(req,res){
    //                }
    //          });
             Empresas.findOneAndUpdate({
-               //_id:new mongo.ObjectId(id),
+               _id:new mongo.ObjectId(id),
                 "tickers.codigo":cod},
             {$push:{"tickers.$.dividendos":{data:dat,valor:val}}},
              function(err, doc){
