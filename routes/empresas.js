@@ -64,7 +64,7 @@ router.post('/ticker/dividendos/save',function(req,res){
    //                }
    //          });
             Empresas.findOneAndUpdate({
-               _id:new mongo.ObjectId(id),
+              // _id:new mongo.ObjectId(id),
                 "tickers.codigo":cod},
             {$push:{"tickers.$.dividendos":{data:dat,valor:val}}},
              function(err, doc){
