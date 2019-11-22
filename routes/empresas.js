@@ -53,7 +53,7 @@ router.post('/ticker/dividendos/save',function(req,res){
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    Empresas.findOne({"tickers.codigo":cod},{tickers:1}).lean().exec((e,tk)=>{      
       Empresas.findOneAndUpdate({"tickers.codigo":cod},{ $push:{"tickers.$[t].dividendo":div}}, { arrayFilters: [ { "t.codigo": cod } ]},
-       {upsert:true}, function(err, doc){
+        function(err, doc){
          if (err)
           return res.send(500, { error: err });
          return res.send("succesfully saved");
