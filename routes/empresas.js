@@ -51,7 +51,7 @@ router.post('/ticker/dividendos/save',function(req,res){
    var cod=req.body.codigo;
    var div=req.body.dividendo.replace(',','.');  
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   Empresas.findOne({"tickers.codigo":cod},{tickers}).lean().exec((e,tk)=>{      
+   Empresas.findOne({"tickers.codigo":cod},{tickers:1}).lean().exec((e,tk)=>{      
       Empresas.findOneAndUpdate({"tickers.codigo":cod},{"tickers.codigo.dividendo":div},
        {upsert:true}, function(err, doc){
          if (err)
