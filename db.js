@@ -11,7 +11,14 @@ var adminSchema = new mongoose.Schema({
 );
 
 var empresasSchema = new mongoose.Schema({
-    tickers: Array,
+    tickers: [{
+        codigo:double,
+        cotacoes:[{data:String, fechamento: double}],
+        dividendo:double
+    },
+    {
+
+    }],
     nome: String,
     _id: Schema.Types.ObjectId,
     logo: String,  
