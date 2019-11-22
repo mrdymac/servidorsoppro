@@ -13,8 +13,8 @@ var adminSchema = new mongoose.Schema({
 var empresasSchema = new mongoose.Schema({
     tickers: [{
         codigo: String,
-        cotacoes:[{data:String, fechamento: String}],
-        dividendos: [{data:String, valor: String}]
+        cotacoes:[{data:String, fechamento: Number}],
+        dividendos: [{data:String, valor: Number}]
     },
     {
 

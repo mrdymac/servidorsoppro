@@ -66,7 +66,7 @@ router.post('/ticker/dividendos/save',function(req,res){
             Empresas.findOneAndUpdate({
               // _id:new mongo.ObjectId(id),
                 "tickers.codigo":cod},
-            {$push:{"tickers.$.dividendos":{data:dat,valor:val}}},
+            {$push:{"tickers.$.dividendos":{data:dat,valor:parseFloat(val)}}},
              function(err, doc){
               if (err)
                return res.send(500, { error: err });
@@ -76,29 +76,32 @@ router.post('/ticker/dividendos/save',function(req,res){
  //  });
 router.post('/ticker/cotacoes/save',function(req,res){
    var db = require("../db");
-   var id=req.body.empresa;
+  // var id=req.body.empresa;
    var cod=req.body.codigo;
    var dat=req.body.data;
-   var valor=req.body.valor.replace(',','.');  
+   var val=req.body.valor.replace(',','.');  
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-  Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec(
-     function(i,emp){
-        var tt=[];
-         emp.tickers.forEach(t=>{
-               if(t.codigo==cod){
-                  t.cotacoes.push({data:dat,fechamento:parseFloat(valor),dividendo:parseFloat(div)});
-                  tt=t;
-               }
-         });
-         Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{tickers:tt},
-         {upsert:true}, function(err, doc){
+//   Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec(
+//      function(i,emp){
+//         var tt=[];
+//          emp.tickers.forEach(t=>{
+//                if(t.codigo==cod){
+//                   t.cotacoes.push({data:dat,fechamento:parseFloat(valor),dividendo:parseFloat(div)});
+//                   tt=t;
+//                }
+//          });
+         Empresas.findOneAndUpdate({
+            // _id:new mongo.ObjectId(id),
+            "tickers.codigo":cod},
+            {$push:{"tickers.$.cotacoes":{data:dat,fechamento:parseFloat(val)}}},
+          function(err, doc){
            if (err)
             return res.send(500, { error: err });
-           return res.send("[{\"ok\":\"saved\"}]");
+           return res.send("[{\"ok\":\"saved cotacoes\"}]");
          });
   });
-});
+//});
 router.get('/', function(req, res) {
    var db = require("../db");
    var lastid=req.query.id;
