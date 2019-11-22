@@ -106,17 +106,7 @@ router.get('/', function(req, res) {
 
 
 function getUltimaCotacao(em){
-    var cotacao=em.tickers[0].cotacoes.sort(
-        (a,b)=>{
-            if ( a.data < b.data ){
-                return -1;
-              }
-              if ( a.data > b.data ){
-                return 1;
-              }
-              return 0;
-        }
-    )[em.tickers[0].cotacoes.length-1];
+    var cotacao=em.tickers[0].cotacoes.sort({data:-1})[0];
     return cotacao.fechamento;
 }
 function getUltimaRecomendacao(em){

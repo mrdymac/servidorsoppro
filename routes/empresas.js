@@ -46,13 +46,29 @@ router.post('/ticker/save',function(req,res){
    });
    
 });
+router.post('/ticker/dividendos/save',function(req,res){
+   var db = require("../db");
+   var cod=req.body.codigo;
+   var div=req.body.dividendo.replace(',','.');  
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   Empresas.findOne({"tickers.codigo":cod},{tickers}).lean().exec((e,tk)=>{
+      tk.push({});
+      Empresas.findOneAndUpdate({"tickers.codigo":cod},{"tickers.codigo.dividendo":empresa.tickers},
+       {upsert:true}, function(err, doc){
+         if (err)
+          return res.send(500, { error: err });
+         return res.send("succesfully saved");
+       });
+   });
+   
+});
 router.post('/ticker/cotacoes/save',function(req,res){
    var db = require("../db");
-   var id=req.body.empresa;
+  // var id=req.body.empresa;
    var cod=req.body.codigo;
    var dat=req.body.data;
    var valor=req.body.valor.replace(',','.');  
-   var div=req.body.dividendo.replace(',','.');  
+  
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
   Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec(
      function(i,emp){
@@ -90,7 +106,7 @@ router.get('/', function(req, res) {
    else if(lastid!=undefined && lastid!="")
       query={_id:new mongo.ObjectID(lastid)};
         
-   Empresas.find(query).skip(skip).limit(limit).sort().lean().exec(
+   Empresas.find(query).skip(skip).limit(limit).sort({nome: 1}).lean().exec(
       function (e, docs) {
          var lista=[];
          docs.forEach((f)=>{

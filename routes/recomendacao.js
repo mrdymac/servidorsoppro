@@ -77,7 +77,7 @@ router.get('/', function(req, res) {
    var inicioAcomp=req.query.inicioAcomp;
    var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   Empresas.find({_id: new mongo.ObjectID(idEmpresa)}).lean().exec(
+   Empresas.find({_id: new mongo.ObjectID(idEmpresa)}).sort({"recomendacoes.data":-1}).lean().exec(
        function (i,emps){
         var lista=[];
         var respondido=false;
