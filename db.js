@@ -14,7 +14,7 @@ var empresasSchema = new mongoose.Schema({
     tickers: [{
         codigo: String,
         cotacoes:[{data:String, fechamento: String}],
-        dividendo: [{data:String, valor: String}]
+        dividendos: [{data:String, valor: String}]
     },
     {
 
