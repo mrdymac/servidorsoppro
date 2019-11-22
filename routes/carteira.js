@@ -134,7 +134,7 @@ function getUltimoAlvo(rec){
     var alvo="";
     if(rec.dados_recomendacao!=undefined)
     rec.dados_recomendacao.forEach((r)=>{
-        if(r.label=="alvo")
+        if(r.label.toLowerCase()=="alvo")
         alvo=r.values;
     });
     return alvo;    

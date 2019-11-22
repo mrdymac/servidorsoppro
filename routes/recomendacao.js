@@ -48,16 +48,15 @@ router.post('/save',function(req,res){
             users.forEach((user)=>{
                 t.push(user.idNotification);
             });
-            var ticker="";
+            
             var alvo="";
            
             rec.dados_recomendacao.forEach((item)=>{
-                if(item.label.toLowerCase()=="ticker")
-                ticker=item.values.toUpperCase();                
+                              
                 if(item.label.toLowerCase()=="alvo")
                 alvo="alvo R$ "+getCurrencyMode(item.values);
             });
-            enviaNotificacao(t, ticker+alvo ,  rec.recomendacao);
+            enviaNotificacao(t, tic+"  "+alvo ,  rec.recomendacao);
             return res.send("succesfully saved");
             });
         });
