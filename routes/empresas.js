@@ -82,7 +82,9 @@ router.post('/ticker/cotacoes/save',function(req,res){
    var val=req.body.valor.replace(',','.');  
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   setTimeout(()=>{
 
+   
    Empresas.findOne({
       // _id:new mongo.ObjectId(id),
       "tickers.codigo":cod,"tickers.cotacoes.data":dat},
@@ -111,6 +113,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
          });
       }
    });  
+   }, 3000);
   });
 //});
 router.get('/', function(req, res) {
