@@ -79,7 +79,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
   // var id=req.body.empresa;
    var cod=req.body.codigo;
    var dat=req.body.data;
-   var val=req.body.valor.replace(',','.');  
+   var val=req.body.valor;  
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    //setTimeout(()=>{
@@ -92,6 +92,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
     function(err, doc){
       if (err)
       return res.send(500, { error: err });
+      console.log(doc);
        if(doc==null){
          Empresas.findOneAndUpdate({
             // _id:new mongo.ObjectId(id),
