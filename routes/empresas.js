@@ -90,7 +90,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
     function(err, doc){
       if (err)
       return res.send(500, { error: err });
-       if(doc.length==0){
+       if(doc==null){
          Empresas.findOneAndUpdate({
             // _id:new mongo.ObjectId(id),
             "tickers.codigo":cod},
