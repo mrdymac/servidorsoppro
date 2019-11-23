@@ -93,6 +93,8 @@ router.post('/ticker/cotacoes/save',function(req,res){
       if (err)
       return res.send(500, { error: err });
       console.log(doc);
+      console.log(parseFloat(val));
+      console.log(dat);
        if(doc==null){
          Empresas.findOneAndUpdate({
             // _id:new mongo.ObjectId(id),
