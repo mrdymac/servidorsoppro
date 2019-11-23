@@ -86,7 +86,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
    Empresas.findOneAndUpdate({
       // _id:new mongo.ObjectId(id),
       "tickers.codigo":cod,"tickers.cotacoes.data":dat},
-      {$set:{"tickers.$.cotacoes":{data:dat,fechamento:parseFloat(val)}}},
+      {$set:{"tickers.$.cotacoes":{fechamento:parseFloat(val)}}},
     function(err, doc){
       if (err)
       return res.send(500, { error: err });
