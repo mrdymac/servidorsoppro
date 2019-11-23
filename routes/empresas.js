@@ -83,10 +83,10 @@ router.post('/ticker/cotacoes/save',function(req,res){
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
 
-   Empresas.findOneAndUpdate({
+   Empresas.findOne({
       // _id:new mongo.ObjectId(id),
       "tickers.codigo":cod,"tickers.cotacoes.data":dat},
-      {$set:{"tickers.$.cotacoes.$":{fechamento:parseFloat(val)}}},
+      
     function(err, doc){
       if (err)
       return res.send(500, { error: err });
@@ -98,12 +98,19 @@ router.post('/ticker/cotacoes/save',function(req,res){
           function(err, doc){
            if (err)
             return res.send(500, { error: err });
-            
+            return res.send("[{\"ok\":\"saved cotacoes\"}]");
          });
-       }   
-     return res.send("[{\"ok\":\"saved cotacoes\"}]");
-   });
-        
+       }  else{
+         Empresas.findOneAndUpdate({
+            "tickers.codigo":cod,"tickers.cotacoes.data":dat},
+            {$set:{"tickers.$.cotacoes.$":{fechamento:parseFloat(val)}}},
+            function(err, doc){
+              if (err)
+              return res.send(500, { error: err });
+              return res.send("[{\"ok\":\"saved cotacoes\"}]");
+         });
+      }
+   });  
   });
 //});
 router.get('/', function(req, res) {
