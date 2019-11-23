@@ -82,15 +82,15 @@ router.post('/ticker/cotacoes/save',function(req,res){
    var val=req.body.valor.replace(',','.');  
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-//   Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec(
-//      function(i,emp){
-//         var tt=[];
-//          emp.tickers.forEach(t=>{
-//                if(t.codigo==cod){
-//                   t.cotacoes.push({data:dat,fechamento:parseFloat(valor),dividendo:parseFloat(div)});
-//                   tt=t;
-//                }
-//          });
+
+   Empresas.findOneAndUpdate({
+      // _id:new mongo.ObjectId(id),
+      "tickers.codigo":cod,"tickers.codigo.data":dat},
+      {$set:{"tickers.$.cotacoes":{fechamento:parseFloat(val)}}},
+    function(err, doc){
+      if (err)
+      return res.send(500, { error: err });
+       if(doc.length==0){
          Empresas.findOneAndUpdate({
             // _id:new mongo.ObjectId(id),
             "tickers.codigo":cod},
@@ -98,8 +98,12 @@ router.post('/ticker/cotacoes/save',function(req,res){
           function(err, doc){
            if (err)
             return res.send(500, { error: err });
-           return res.send("[{\"ok\":\"saved cotacoes\"}]");
+            
          });
+       }   
+     return res.send("[{\"ok\":\"saved cotacoes\"}]");
+   });
+        
   });
 //});
 router.get('/', function(req, res) {
