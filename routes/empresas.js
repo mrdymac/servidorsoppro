@@ -90,17 +90,17 @@ router.post('/ticker/cotacoes/save',function(req,res){
     function(err, doc){
       if (err)
       return res.send(500, { error: err });
-      //  if(doc==null){
-      //    Empresas.findOneAndUpdate({
-      //       // _id:new mongo.ObjectId(id),
-      //       "tickers.codigo":cod},
-      //       {$push:{"tickers.$.cotacoes":{data:dat,fechamento:parseFloat(val)}}},
-      //     function(err, doc){
-      //      if (err)
-      //       return res.send(500, { error: err });
+       if(doc==null){
+         Empresas.findOneAndUpdate({
+            // _id:new mongo.ObjectId(id),
+            "tickers.codigo":cod},
+            {$push:{"tickers.$.cotacoes":{data:dat,fechamento:parseFloat(val)}}},
+          function(err, doc){
+           if (err)
+            return res.send(500, { error: err });
             
-      //    });
-      //  }   
+         });
+       }   
      return res.send("[{\"ok\":\"saved cotacoes\"}]");
    });
         
