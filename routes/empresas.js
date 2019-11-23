@@ -103,7 +103,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
           function(err, doc){
            if (err)
             return res.send(500, { error: err });
-            return res.send("[{\"ok\":\"saved cotacoes\"}]");
+            return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
          });
        }  else{
          Empresas.findOneAndUpdate({
@@ -112,7 +112,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
             function(err, doc){
               if (err)
               return res.send(500, { error: err });
-              return res.send("[{\"ok\":\"saved cotacoes\"}]");
+              return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
          });
       }
    });  
