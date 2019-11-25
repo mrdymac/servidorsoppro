@@ -72,8 +72,8 @@ router.get('/', function(req, res) {
                 f.carteira.forEach((g)=>{                    
                     var idd=new mongo.ObjectID(g.id_empresa);
                     var em=Empresas.find({_id:g.id_empresa}).lean().exec(
-                        function (s, em) {
-                            var ultimacot=getUltimaCotacao(em[0]);
+                        async function (s, em) {
+                            var ultimacot=await getUltimaCotacao(em[0]);
                             var emp={
                                 id:g.id_empresa, 
                                 nome: em[0].nome,
