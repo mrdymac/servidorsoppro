@@ -72,8 +72,8 @@ router.get('/', function(req, res) {
                 f.carteira.forEach((g)=>{                    
                     var idd=new mongo.ObjectID(g.id_empresa);
                     var em=Empresas.find({_id:g.id_empresa}).lean().exec(
-                        async function (s, em) {
-                            var ultimacot=await getUltimaCotacao(em[0]);
+                        function (s, em) {
+                            var ultimacot=0;//getUltimaCotacao(em[0]);
                             var emp={
                                 id:g.id_empresa, 
                                 nome: em[0].nome,
@@ -105,12 +105,11 @@ router.get('/', function(req, res) {
 })
 
 
-async function getUltimaCotacao(em){
+ function getUltimaCotacao(em){
     var db = require("../db");
     var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-    await Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
+     Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
        function (e, docs) { 
-    if(docs.length>0){
     var cotacao=docs[0].cotacoes.sort(
         (a,b)=>{
             if ( a.data < b.data ){
@@ -123,8 +122,6 @@ async function getUltimaCotacao(em){
         }
     )[docs[0].cotacoes.length-1];
     return cotacao.fechamento;
-    }else
-        return 0;
     });
        
 }
