@@ -108,7 +108,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
        }  else{
          Empresas.findOneAndUpdate({
             "tickers.codigo":cod,"tickers.cotacoes.data":dat},
-            {$push:{"tickers.$.cotacoes.$":{fechamento:parseFloat(val)}}},
+            {$set:{"tickers.0.cotacoes.0.fechamento":parseFloat(val)}},
             function(err, doc){
               if (err)
               return res.send(500, { error: err });
