@@ -110,6 +110,7 @@ async function getUltimaCotacao(em){
     var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
     await Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
        function (e, docs) { 
+    if(docs.length>0){
     var cotacao=docs[0].cotacoes.sort(
         (a,b)=>{
             if ( a.data < b.data ){
@@ -122,6 +123,8 @@ async function getUltimaCotacao(em){
         }
     )[docs[0].cotacoes.length-1];
     return cotacao.fechamento;
+    }else
+        return 0;
     });
        
 }
