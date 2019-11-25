@@ -73,12 +73,12 @@ router.get('/', function(req, res) {
                     var idd=new mongo.ObjectID(g.id_empresa);
                     var em=Empresas.find({_id:g.id_empresa}).lean().exec(
                         function (s, em) {
-                            
+                            var ultimacot=await getUltimaCotacao(em[0]);
                             var emp={
                                 id:g.id_empresa, 
                                 nome: em[0].nome,
                                 logo:em[0].logo,
-                                cotacao_atual:0,
+                                cotacao_atual:getCurrencyMode(ultimacot),
                                 ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
                                 ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
                                 atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
