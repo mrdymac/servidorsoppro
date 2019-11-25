@@ -11,14 +11,6 @@ var adminSchema = new mongoose.Schema({
 );
 
 var empresasSchema = new mongoose.Schema({
-    tickers: [{
-        codigo: String,
-        cotacoes:[{data:String, fechamento: Number}],
-        dividendos: [{data:String, valor: Number}]
-    },
-    {
-
-    }],
     nome: String,
     _id: Schema.Types.ObjectId,
     logo: String,  
@@ -46,4 +38,12 @@ var planoSchema=new mongoose.Schema({
     codigo: String
 }, { collection: 'planos' }
 );
-module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema }
+var tickersSchema=new mongoose.Schema({
+    _id:Schema.Types.ObjectId,
+    idEmpresa:Schema.Types.ObjectId,
+    codigo: String,
+    cotacoes:[{data:String, fechamento: Number}],
+    dividendos: [{data:String, valor: Number}]
+},{collection:'tickers'}
+);
+module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema, TickersSchema:tickersSchema }

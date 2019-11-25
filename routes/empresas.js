@@ -33,11 +33,11 @@ router.post('/save',function(req,res){
 router.post('/ticker/save',function(req,res){
    var db = require("../db");
    var cod=req.body.codigo;
-   var id=req.body.empresa;  
-   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   var id=req.body.empresa;
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
 // Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
       //empresa.tickers.push({codigo:cod,cotacoes:[]});
-      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$push:{tickers:{codigo:cod,cotacoes:[],dividendos:[]}}},
+      Tickers.findOneAndUpdate({codigo:cod},{idEmpresa:new mongo.ObjectID(id),codigo:cod,cotacoes:[],dividendos:[]},
              {upsert:true}, function(err, doc){
          if (err)
           return res.send(500, { error: err });
@@ -47,75 +47,78 @@ router.post('/ticker/save',function(req,res){
    
 //});
 router.post('/ticker/dividendos/save',function(req,res){
-   
-      var db = require("../db");
-      var id=req.body.empresa;
-      var cod=req.body.codigo;
-      var dat=req.body.data;
-      var val=req.body.valor.replace(',','.');  
-      var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   //   Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec(
-   //      function(i,emp){
-   //         var tt=[];
-   //          emp.tickers.forEach(t=>{
-   //                if(t.codigo==cod){
-   //                   t.cotacoes.push({data:dat,fechamento:parseFloat(valor),dividendo:parseFloat(div)});
-   //                   tt=t;
-   //                }
-   //          });
-            Empresas.findOneAndUpdate({
-              // _id:new mongo.ObjectId(id),
-                "tickers.codigo":cod},
-            {$push:{"tickers.$.dividendos":{data:dat,valor:parseFloat(val)}}},
-             function(err, doc){
-              if (err)
-               return res.send(500, { error: err });
-              return res.send("[{\"ok\":\"saved\"}]");
-            });
-     });
- //  });
-router.post('/ticker/cotacoes/save',function(req,res){
    var db = require("../db");
   // var id=req.body.empresa;
    var cod=req.body.codigo;
    var dat=req.body.data;
    var val=req.body.valor;  
   
-   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
    setTimeout(()=>{
 
    
-   Empresas.findOne({
-      // _id:new mongo.ObjectId(id),
-      "tickers.codigo":cod,"tickers.cotacoes.data":dat},
-      
-    function(err, doc){
-      if (err)
-      return res.send(500, { error: err });
-      console.log(doc);
-      console.log(parseFloat(val));
-      console.log(dat);
-       if(doc==null){
-         Empresas.findOneAndUpdate({
+         
+         Tickers.findOneAndUpdate({
             // _id:new mongo.ObjectId(id),
-            "tickers.codigo":cod},
-            {$push:{"tickers.$.cotacoes":{data:dat,fechamento:parseFloat(val)}}},
+            "codigo":cod, "dividendos.data":dat},
+            {$set:{"dividendos.$.valor":parseFloat(val)}},
+            
           function(err, doc){
-           if (err)
-            return res.send(500, { error: err });
+            console.log(doc);
+            if(doc==null)
+            Tickers.findOneAndUpdate({
+                // _id:new mongo.ObjectId(id),
+                "codigo":cod},
+                {$push:{"dividendos":{data:dat,valor:parseFloat(val)}}},
+                function(err2,dd){
+           if (err2)
+            return res.send(500, { error: err2 });
             return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
          });
-       }  else{
-         Empresas.findOneAndUpdate({
-            "tickers.codigo":cod,"tickers.cotacoes.data":dat},
-            {$set:{"tickers.0.cotacoes.0.fechamento":parseFloat(val)}},
-            function(err, doc){
-              if (err)
-              return res.send(500, { error: err });
-              return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
+         else {
+        if (err)
+         return res.send(500, { error: err });
+         return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
+         }
+        });
+   }, 3000);
+});
+ //  });
+ router.post('/ticker/cotacoes/save',function(req,res){
+   var db = require("../db");
+  // var id=req.body.empresa;
+   var cod=req.body.codigo;
+   var dat=req.body.data;
+   var val=req.body.valor;  
+  
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+   setTimeout(()=>{
+
+   
+         
+         Tickers.findOneAndUpdate({
+            // _id:new mongo.ObjectId(id),
+            "codigo":cod, "cotacoes.data":dat},
+            {$set:{"cotacoes.$.fechamento":parseFloat(val)}},
+            
+          function(err, doc){
+            console.log(doc);
+            if(doc==null)
+            Tickers.findOneAndUpdate({
+                // _id:new mongo.ObjectId(id),
+                "codigo":cod},
+                {$push:{"cotacoes":{data:dat,fechamento:parseFloat(val)}}},
+                function(err2,dd){
+           if (err2)
+            return res.send(500, { error: err2 });
+            return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
          });
-      }
-   });  
+         else {
+        if (err)
+         return res.send(500, { error: err });
+         return res.status(200).send("[{\"ok\":\"saved cotacoes\"}]");
+         }
+        });
    }, 3000);
   });
 //});
@@ -182,24 +185,22 @@ router.get('/', function(req, res) {
                 res.status(200).send(lista);    
         });
 });
+
 router.get('/cotacoes', function(req, res) {
    var db = require("../db");
    var lastid=req.query.id;  
-  // var ticker=req.query.ticker;  
-   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   Empresas.find({_id:new mongo.ObjectID(lastid)}).lean().exec(
-      function (e, docs) {   
-         var lista=[];
-         docs[0].tickers.forEach(t=>{            
-               t.cotacoes.forEach(cotacao=>{
-                  if(cotacao.data!=undefined)
-               lista.push({data: getDataFormatada(cotacao.data), values:parseFloat(cotacao.fechamento)});   
-            });
-         });
+   var ticker=req.query.ticker;  
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+   Tickers.find({idEmpresa:lastid,codigo:ticker},{cotacoes:1}).lean().exec(
+      function (e, docs) { 
+       var lista=docs[0].cotacoes;
+          
+       lista.forEach(element => {
+           element.data=getDataFormatada(element.data);
+       });
          res.status(200).send(lista);               
         });
 });
-
 
 
 router.get('/recomendacoes', function(req, res) {
