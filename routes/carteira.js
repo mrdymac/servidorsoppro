@@ -78,7 +78,7 @@ router.get('/', function(req, res) {
                                 id:g.id_empresa, 
                                 nome: em[0].nome,
                                 logo:em[0].logo,
-                                cotacao_atual:getCurrencyMode(await getUltimaCotacao(em[0])),
+                                cotacao_atual:0,
                                 ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
                                 ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
                                 atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 

@@ -202,6 +202,19 @@ router.get('/cotacoes', function(req, res) {
         });
 });
 
+router.get('/cotacoes/ultima', function(req, res) {
+   var db = require("../db");
+   var cod=req.query.codigo;  
+  // var ticker=req.query.ticker;  
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+   Tickers.find({codigo:cod},{cotacoes:1}).lean().exec(
+      function (e, docs) { 
+          var cotacao=getUltimaCotacao(docs[0]);
+          cotacao.data=getDataFormatada(cotacao.data);
+          
+         res.status(200).send(cotacao);               
+        });
+});
 
 router.get('/recomendacoes', function(req, res) {
    var db = require("../db");
