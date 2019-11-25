@@ -82,7 +82,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
    var val=req.body.valor;  
   
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   //setTimeout(()=>{
+   setTimeout(()=>{
 
    
    Empresas.findOne({
@@ -116,7 +116,7 @@ router.post('/ticker/cotacoes/save',function(req,res){
          });
       }
    });  
- //  }, 3000);
+   }, 3000);
   });
 //});
 router.get('/', function(req, res) {
