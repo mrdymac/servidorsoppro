@@ -191,7 +191,7 @@ router.get('/cotacoes', function(req, res) {
    var lastid=req.query.id;  
    var ticker=req.query.ticker;  
    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-   Tickers.find({idEmpresa:new mongo.ObjectId(lastid),codigo:ticker},{cotacoes:1}).lean().exec(
+   Tickers.find({idEmpresa:new mongo.ObjectId(lastid),"cotacoes.codigo":ticker},{cotacoes:1}).lean().exec(
       function (e, docs) { 
        var lista=docs;
           
