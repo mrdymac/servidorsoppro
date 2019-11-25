@@ -204,10 +204,10 @@ router.get('/cotacoes', function(req, res) {
 
 router.get('/cotacoes/ultima', function(req, res) {
    var db = require("../db");
-   var cod=req.query.codigo;  
+   var id=req.query.id;  
   // var ticker=req.query.ticker;  
    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-   Tickers.find({codigo:cod},{cotacoes:1}).lean().exec(
+   Tickers.find({idEmpresa:new mongo.ObjectId(id)},{cotacoes:1}).lean().exec(
       function (e, docs) { 
           var cotacao=getUltimaCotacao(docs[0]);
           cotacao.data=getDataFormatada(cotacao.data);
