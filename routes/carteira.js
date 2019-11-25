@@ -106,6 +106,7 @@ router.get('/', function(req, res) {
 
 
 function getUltimaCotacao(em){
+    var db = require("../db");
     var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
     Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
        function (e, docs) { 
