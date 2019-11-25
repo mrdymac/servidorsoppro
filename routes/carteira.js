@@ -105,8 +105,11 @@ router.get('/', function(req, res) {
 })
 
 
-function getUltimaCotacao(tick){
-    var cotacao=tick.cotacoes.sort(
+function getUltimaCotacao(em){
+    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+    Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
+       function (e, docs) { 
+    var cotacao=docs[0].cotacoes.sort(
         (a,b)=>{
             if ( a.data < b.data ){
                 return -1;
@@ -116,8 +119,10 @@ function getUltimaCotacao(tick){
               }
               return 0;
         }
-    )[tick.cotacoes.length-1];
+    )[docs[0].cotacoes.length-1];
     return cotacao.fechamento;
+    });
+       
 }
 function getUltimaRecomendacao(em){
     return em.recomendacoes.sort((a,b)=>{
