@@ -193,7 +193,7 @@ router.get('/cotacoes', function(req, res) {
    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
    Tickers.find({idEmpresa:lastid,codigo:ticker},{cotacoes:1}).lean().exec(
       function (e, docs) { 
-       var lista=docs[0].cotacoes;
+       var lista=docs;
           
        lista.forEach(element => {
            element.data=getDataFormatada(element.data);
