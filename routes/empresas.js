@@ -245,5 +245,20 @@ function getDataFormatada(valor){
    var data=valor;//.toISOString().substr(0,10);
   return data.substr(6,2)+"/"+data.substr(4,2)+"/"+data.substr(0,4)
 }
+
+function getUltimaCotacao(tick){
+   var cotacao=tick.cotacoes.sort(
+       (a,b)=>{
+           if ( a.data < b.data ){
+               return -1;
+             }
+             if ( a.data > b.data ){
+               return 1;
+             }
+             return 0;
+       }
+   )[tick.cotacoes.length-1];
+   return cotacao;
+}
 module.exports = router;
 
