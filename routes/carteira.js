@@ -12,14 +12,23 @@ router.post('/insereEmpresa', function(req, res) {
     var tick=req.body.ticker;
     var inicio=req.body.inicioAcomp;
     var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-    Users.findOne({email:e}).lean().exec((e,user)=>{
-        user.carteira.push({id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio, preco_entrada:getUltimaCotacao(tick)})
-        Users.findOneAndUpdate({_id:user._id},{carteira:user.carteira},
-        {upsert:true}, function(err, doc){
-          if (err)
-           return res.send(500, { error: err }); 
-          return res.send("[{\"ok\":\"saved\"}]");
+    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+    Users.findOne({email:e}).lean().exec((err2,user)=>{
+        Tickers.findOne({idEmpresa:new mongo.ObjectId(id)}).exec((err,tic)=>{
+            var p_entrada=0;
+            if(tic!=null)
+                p_entrada=getUltimaCotacao(tic);
+            else
+                return res.send(500, { error: err });
+            
+            Users.findOneAndUpdate({_id:user._id},{$push:{carteira:{id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio, preco_entrada:p_entrada}}},
+            function(err, doc){
+            if (err)
+                return res.send(500, { error: err }); 
+            return res.send("[{\"ok\":\"saved\"}]");
+            });
         });
+        
     });
 });
 router.post('/removeEmpresa', function(req, res) {
