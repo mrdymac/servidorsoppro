@@ -69,14 +69,13 @@ router.get('/', function(req, res) {
          docs.forEach((f)=>{   
                 var index=0;
                 if(f.carteira.length>0)            
-                f.carteira.forEach((g)=>{                    
-                    var idd=new mongo.ObjectID(g.id_empresa);
-                    var em=Empresas.find({_id:g.id_empresa}).lean().exec(
+                f.carteira.forEach((g)=>{                                        
+                    Empresas.find({_id:g.id_empresa}).lean().exec(
                         function (s, em) {
 
                             var ultimacot=0;//getUltimaCotacao(em[0]);
                             var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-                            Tickers.find({idEmpresa:new mongo.ObjectId(id)},{cotacoes:1}).lean().exec(
+                            Tickers.find({idEmpresa:new mongo.ObjectId(g.id_empresa)},{cotacoes:1}).lean().exec(
                                function (e, tick) { 
                                 var emp={
                                     id:g.id_empresa, 
