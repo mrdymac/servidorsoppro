@@ -88,7 +88,8 @@ router.get('/', function(req, res) {
                                     ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
                                     atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
                                     normalized: em[0].normalized,
-                                    inicio_acompanhamento:g.inicio_acomp
+                                    inicio_acompanhamento:g.inicio_acomp,
+                                    preco_entrada:getCurrencyMode(g.preco_entrada),
                                 };
                                 index++;
                                 if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
