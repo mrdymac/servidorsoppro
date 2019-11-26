@@ -177,8 +177,9 @@ router.get('/', function(req, res) {
                            if(!listauser.includes(item.id.toString()))
                            lista2.push(item);
                         
-                     });
-                  }
+                        });
+                     }
+                     console.log(users.carteira);
                      res.status(200).send(lista2);
                   }) 
              else 
@@ -211,6 +212,7 @@ router.get('/cotacoes/ultima', function(req, res) {
       function (e, docs) { 
           var cotacao=getUltimaCotacao(docs[0]);
           cotacao.data=getDataFormatada(cotacao.data);
+          
           
          res.status(200).send(cotacao);               
         });
