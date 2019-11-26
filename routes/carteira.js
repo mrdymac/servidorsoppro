@@ -125,6 +125,8 @@ router.get('/', function(req, res) {
               return 0;
         }
     )[tick.cotacoes.length-1];
+    if(cotacao==undefined)
+    return 0;
     return cotacao.fechamento;
     
        
