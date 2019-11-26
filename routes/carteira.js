@@ -9,10 +9,11 @@ router.post('/insereEmpresa', function(req, res) {
     var db = require("../db");
     var e=req.body.email;
     var id=req.body.empresa;
+    var tick=req.body.ticker;
     var inicio=req.body.inicioAcomp;
     var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
     Users.findOne({email:e}).lean().exec((e,user)=>{
-        user.carteira.push({id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio})
+        user.carteira.push({id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio, preco_entrada:getUltimaCotacao(tick)})
         Users.findOneAndUpdate({_id:user._id},{carteira:user.carteira},
         {upsert:true}, function(err, doc){
           if (err)
