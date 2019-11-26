@@ -73,23 +73,28 @@ router.get('/', function(req, res) {
                     var idd=new mongo.ObjectID(g.id_empresa);
                     var em=Empresas.find({_id:g.id_empresa}).lean().exec(
                         function (s, em) {
+
                             var ultimacot=0;//getUltimaCotacao(em[0]);
-                            var emp={
-                                id:g.id_empresa, 
-                                nome: em[0].nome,
-                                logo:em[0].logo,
-                                cotacao_atual:getCurrencyMode(ultimacot),
-                                ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
-                                ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
-                                atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
-                                normalized: em[0].normalized,
-                                inicio_acompanhamento:g.inicio_acomp
-                            };
-                            index++;
-                            if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
-                                lista.push(emp);
-                            if(f.carteira.length==index)                            
-                                res.status(200).send(lista);                            
+                            var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+                            Tickers.find({idEmpresa:new mongo.ObjectId(id)},{cotacoes:1}).lean().exec(
+                               function (e, tick) { 
+                                var emp={
+                                    id:g.id_empresa, 
+                                    nome: em[0].nome,
+                                    logo:em[0].logo,
+                                    cotacao_atual:getCurrencyMode(getUltimaCotacao(tick)),
+                                    ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
+                                    ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
+                                    atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
+                                    normalized: em[0].normalized,
+                                    inicio_acompanhamento:g.inicio_acomp
+                                };
+                                index++;
+                                if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
+                                    lista.push(emp);
+                                if(f.carteira.length==index)                            
+                                    res.status(200).send(lista);                            
+                            });
                         }
                     );                     
                 })
@@ -105,12 +110,9 @@ router.get('/', function(req, res) {
 })
 
 
- function getUltimaCotacao(em){
-    var db = require("../db");
-    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-     Tickers.find({idEmpresa:em._id},{cotacoes:1}).lean().exec(
-       function (e, docs) { 
-    var cotacao=docs[0].cotacoes.sort(
+ function getUltimaCotacao(tick){
+    
+    var cotacao=tick.cotacoes.sort(
         (a,b)=>{
             if ( a.data < b.data ){
                 return -1;
@@ -120,9 +122,9 @@ router.get('/', function(req, res) {
               }
               return 0;
         }
-    )[docs[0].cotacoes.length-1];
+    )[tick.cotacoes.length-1];
     return cotacao.fechamento;
-    });
+    
        
 }
 function getUltimaRecomendacao(em){
