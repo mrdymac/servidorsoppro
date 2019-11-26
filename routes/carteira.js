@@ -77,11 +77,12 @@ router.get('/', function(req, res) {
                             var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
                             Tickers.find({idEmpresa:new mongo.ObjectId(g.id_empresa)},{cotacoes:1}).lean().exec(
                                function (e, tick) { 
+                                   if(tick.length>0){
                                 var emp={
                                     id:g.id_empresa, 
                                     nome: em[0].nome,
                                     logo:em[0].logo,
-                                    cotacao_atual:getCurrencyMode(getUltimaCotacao(tick)),
+                                    cotacao_atual:getCurrencyMode(getUltimaCotacao(tick[0])),
                                     ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
                                     ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
                                     atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
@@ -92,7 +93,9 @@ router.get('/', function(req, res) {
                                 if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
                                     lista.push(emp);
                                 if(f.carteira.length==index)                            
-                                    res.status(200).send(lista);                            
+                                    res.status(200).send(lista);  
+                            }else                          
+                                res.status(200).send([]);  
                             });
                         }
                     );                     
