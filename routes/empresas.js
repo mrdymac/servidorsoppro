@@ -18,7 +18,7 @@ router.post('/save',function(req,res){
    var tick=req.body.ticker;
    var lo=req.body.logo;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[{}],normalized:n.toLowerCase(),ticker:tick});
+   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[{}],normalized:n.toLowerCase(),tickers:tick});
    empresa.save(function (err) {
       if (err) {
           console.log("Error! " + err.message);

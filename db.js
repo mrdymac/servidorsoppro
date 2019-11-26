@@ -15,7 +15,7 @@ var empresasSchema = new mongoose.Schema({
     nome: String,
     _id: Schema.Types.ObjectId,
     logo: String,  
-    ticker:String,
+    tickers:String,
     recomendacoes:Array,
     normalized:String,
     setor_id:String
