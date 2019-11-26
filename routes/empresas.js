@@ -15,10 +15,10 @@ var mongo = require('mongodb');
 router.post('/save',function(req,res){
    var db = require("../db");
    var n=req.body.nome;
-   //var ticker=req.body.ticker;
+   var tick=req.body.ticker;
    var lo=req.body.logo;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[{}],normalized:n.toLowerCase()});
+   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[{}],normalized:n.toLowerCase(),ticker:tick});
    empresa.save(function (err) {
       if (err) {
           console.log("Error! " + err.message);
@@ -147,10 +147,7 @@ router.get('/', function(req, res) {
          docs.forEach((f)=>{
             var ff="";
 
-                f.tickers.forEach((g)=>{
-                    ff+=g.codigo+",";
-                });
-                f.tickers=ff.substr(0,ff.length-1);
+                
                 f.id=f._id;
                 if(f.recomendacoes[0].dados_recomendacao!=undefined)
                   f.num_recomendacao=f.recomendacoes.length.toString();

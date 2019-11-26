@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://adminmongo:Curtisp40@mongo_soprodb:27017/soprodb');
+// mongoose.connect('mongodb://adminmongo:Curtisp40@mongo_soprodb:27017/soprodb');
 //  mongoose.connect('mongodb://adminmongo:Curtisp40@kamino.mongodb.umbler.com:45553/soprodb');
+ mongoose.connect("mongodb+srv://adminmongo:Curtisp40@cluster0-qwok3.gcp.mongodb.net/soprodb?retryWrites=true&w=majority");
 const Schema = mongoose.Schema;
 
 var adminSchema = new mongoose.Schema({
@@ -14,6 +15,7 @@ var empresasSchema = new mongoose.Schema({
     nome: String,
     _id: Schema.Types.ObjectId,
     logo: String,  
+    tickers:String,
     recomendacoes:Array,
     normalized:String,
     setor_id:String
