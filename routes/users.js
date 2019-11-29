@@ -47,7 +47,7 @@ router.get('/plano', function(req, res, next) {
  
   Users.findOne({email:e}).lean().exec(
     function (a,b){
-      //checa validade (b.validade)
+     
       
       if(b==null){
         res.send([]);
@@ -79,13 +79,41 @@ router.get('/plano', function(req, res, next) {
   
 });
 
+router.post('/plano/assina', function(req, res, next) {
+  var db = require("../db");
+  var e=req.body.email;
+  var plano=req.body.plano;  
+  var tok=req.body.token; 
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
+  //verifica na api do google ou ios apple a situacao da assinatura
+  var validad=hojeToString();
+  Planos.findOne({codigo:plano}).lean().exec((e,p)=>{
+    Users.findOneAndUpdate({email:e, token:tok},{$set:{idPlano:p._id,validade:validad}}).lean().exec(
+      function (a,b){     
+        if(a){
+          return res.send([{'erro':'erro'}]);
+        }else{
+          return res.send([{'ok':'saved'}]);
+        }
+      });
+  });
+ 
+  
+});
+function hojeToString(){
+ var data = new Date(Date.now());
+ var newDate = new Date(data.setTime( data.getTime() + 30 * 86400000 ));
+ 
+ return newDate.getFullYear().toString()+newDate.getMonth().toString()+newDate.getDate();
+}
 function checaValidade(userPlano, Model){
   if(userPlano.validade==null)
   return;
   var validade=new Date(userPlano.validade.substr(0,4),userPlano.validade.substr(4,2),userPlano.validade.substr(6,2));
   var hoje=Date.now();
   if(validade<hoje){
-    console.log("vencido");
+    
     Model.findOneAndUpdate({email:userPlano.email},{idPlano:null},function(e){
       if (e) {
         console.log("Error! " + err.message);
@@ -97,6 +125,7 @@ function checaValidade(userPlano, Model){
     })
   }
 
+  
 }
 
 module.exports = router;
