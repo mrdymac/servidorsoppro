@@ -27,6 +27,7 @@ var usersSchema = new mongoose.Schema({
    idNotification: String,
    email:String,
    token: String,
+   tokenCompra:String,
    senha: String,
    carteira: Array ,
    idPlano: String,
@@ -37,13 +38,14 @@ var usersSchema = new mongoose.Schema({
 var planoSchema=new mongoose.Schema({
     _id:Schema.Types.ObjectId,
     num_empresas: String,
-    codigo: String
+    codigo: String,
+    idGooglePlay:String,
 }, { collection: 'planos' }
 );
 var tickersSchema=new mongoose.Schema({
     _id:Schema.Types.ObjectId,
-    idEmpresa:Schema.Types.ObjectId,
-    codigo: String,
+    idEmpresa:Schema.Types.ObjectId,    codigo: String,
+   
     cotacoes:[{data:String, fechamento: Number}],
     dividendos: [{data:String, valor: Number}]
 },{collection:'tickers'}

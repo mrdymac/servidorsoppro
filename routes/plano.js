@@ -6,17 +6,15 @@ router.post('/save', function(req, res, next) {
     var db = require("../db");
     var cod=req.body.codigo;
     var num_empr=req.body.num_empresas;
+    var idGoogle=req.body.idgoogle;
     var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
-    var plano=new Planos({_id:new mongo.ObjectID(),codigo:cod,num_empresas:num_empr});
+    var plano=new Planos({_id:new mongo.ObjectID(),codigo:cod,num_empresas:num_empr, idGooglePlay:idGoogle});
     plano.save(function (err) {
-        if (err) {
-            console.log("Error! " + err.message);
-            return err;
-        }
-        else {
-            console.log("Post saved");
-          res.redirect("/empresas?page=1");
-        }
+        if(err){
+            return res.send([{'erro':'erro'}]);
+          }else{
+            return res.send([{'ok':'saved'}]);
+          }
      });
   });
 
