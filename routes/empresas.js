@@ -30,6 +30,41 @@ router.post('/save',function(req,res){
       }
    });
 });
+router.delete('/delete/:id',function(req,res){
+   var db = require("../db");
+   var id=req.params.id;
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   Empresas.findOneAndDelete({_id:new mongo.ObjectId(id)}).exec((err,emp)=>{      
+      if (err) {
+          console.log("Error! " + err.message);
+          res.status(500);
+          return err;
+          
+      }
+      else {
+          console.log("Deleted");
+          res.status(200).send({"ok":"deletado"});
+      }
+   });
+});
+router.get('/tickers',function(req,res){
+   var db = require("../db");   
+   var id=req.query.empresa;
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+// Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
+      //empresa.tickers.push({codigo:cod,cotacoes:[]});
+      Tickers.find({idEmpresa:new mongo.ObjectID(id)},
+         function(err, doc){
+            Empresas.findOne({_id:new mongo.ObjectID(id)},
+            function(e,emp){
+               if (err)
+               return res.send(500, { error: err });
+               return res.render("tickers",{lista:doc,empresa:emp});
+       });
+      });
+   });
+   
 router.post('/ticker/save',function(req,res){
    var db = require("../db");
    var cod=req.body.codigo;
@@ -41,10 +76,24 @@ router.post('/ticker/save',function(req,res){
              {upsert:true}, function(err, doc){
          if (err)
           return res.send(500, { error: err });
-         return res.send("succesfully saved");
+         return res.redirect("/tickers");
        });
    });
-   
+   router.delete('/ticker/delete/:id',function(req,res){
+      var db = require("../db");
+      var id=req.param.id;
+      
+      var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+   // Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
+         //empresa.tickers.push({codigo:cod,cotacoes:[]});
+         Tickers.findOneAndDelete({_id:id},
+                function(err, doc){
+                  if (err)
+                  return res.send(500, { error: err });
+                  return res.redirect("/tickers?empresa="+doc.idEmpresa);
+                  
+               });
+      });
 //});
 router.post('/ticker/dividendos/save',function(req,res){
    var db = require("../db");
@@ -230,6 +279,15 @@ router.get('/recomendacoes', function(req, res) {
          res.status(200).send(lista);               
         });
 });
+
+router.get('/lista', function(req, res) {
+   var db = require("../db");
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   Empresas.find({}).lean().exec((a,b)=>{
+         res.render("empresas",{lista:b});
+   });   
+});
+
 function getCurrencyMode(valor){
    var moeda=valor.toString().split('.');
    if(moeda.length==2)

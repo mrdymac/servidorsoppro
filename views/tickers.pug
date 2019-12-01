@@ -1,0 +1,33 @@
+extends layout
+block content
+    h3 Empresas 
+    div 
+        form(action="./ticker/save", method="post")
+            input(type="hidden", name="empresa", value=empresa._id)
+            label Codigo:  
+            input(type="text" name="codigo")
+            input(type="submit", value="Salvar")
+    table(class="table")
+        thead 
+            th Id
+        tbody
+            each item in lista
+                tr  
+                    td=item.codigo
+                    td
+                        button(onclick="deletar('"+item._id+"')" class="btn btn-primary") Excluir
+    script.
+        function deletar(val){
+            if(confirm("Deletar?"))
+            $.ajax({
+                url: './ticker/delete/'+val,
+                type: 'DELETE',
+                success: function(result) {
+                    location.reload();
+                }
+            });
+            
+            }
+    
+                    
+

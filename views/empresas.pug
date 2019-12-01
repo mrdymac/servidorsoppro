@@ -1,0 +1,54 @@
+extends layout
+block content
+    h3 Empresas
+    div(class="row" style="padding:0 0 20 20")        
+        form(action="./save" style="width:100%" method="POST")
+            div(class="row" style="padding:20px")
+                div(class="col-sm-12 form-group")
+                    label(class="label") Nome:                 
+                    input(type="text" name="nome" class="form-control col-sm-12" required)            
+                
+                    label(class="label") URL Logo: 
+                    input(type="text" name="logo"  class="form-control col-sm-12" required)
+                
+                    label(class="label") Tickers: 
+                    input(type="text" name="ticker"  class="form-control col-sm-12" required)
+                   
+                    input(type="submit" value="salvar" class="btn btn-primary" style="margin: 20px; width:100px" )
+        
+    div(class="row")
+        div(class="col-sm-12")
+            table(class="table table-striped table-bordered")
+                thead   
+                    th Logo
+                    th Nome
+                    th Ticker
+                    th
+                tbody 
+                    each item in lista 
+                        tr
+                            td
+                                img(src=item.logo width=100)
+                            td=item.nome
+                            td=item.tickers
+                            td
+                                button(onclick="deletar('"+item._id+"')" class="btn btn-primary") Excluir
+                            td
+                                a(href="./tickers?empresa="+item._id class="btn btn-primary") AddTickers
+                                    
+                    
+    script $("table").DataTable();
+    script.
+        function deletar(val){
+            if(confirm("Deletar?"))
+            $.ajax({
+                url: './delete/'+val,
+                type: 'DELETE',
+                success: function(result) {
+                    location.reload();
+                }
+            });
+            
+            }
+    
+                        

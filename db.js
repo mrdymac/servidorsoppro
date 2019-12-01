@@ -50,4 +50,4 @@ var tickersSchema=new mongoose.Schema({
     dividendos: [{data:String, valor: Number}]
 },{collection:'tickers'}
 );
-module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema, TickersSchema:tickersSchema }
+module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema, TickersSchema:tickersSchema } 
