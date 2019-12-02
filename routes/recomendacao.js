@@ -116,7 +116,8 @@ router.get('/', function(req, res) {
                    ticker:rec.ticker,
                    data: rec.data,
                    disclaimer: rec.autor,
-                   inicio_acomp: inicioAcomp.substr(8,2)+"/"+inicioAcomp.substr(5,2)+"/"+inicioAcomp.substr(0,4)
+                   inicio_acomp: inicioAcomp.substr(8,2)+"/"+inicioAcomp.substr(5,2)+"/"+inicioAcomp.substr(0,4),
+                   ticker:rec.ticker
                };
                
                lista.push(reco);
