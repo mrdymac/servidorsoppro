@@ -33,7 +33,7 @@ router.get('/productList', function(req, res) {
     var l=[];
     plano.forEach((item)=>{
       if(item.idGooglePlay!=null)
-      l.push(item.idGooglePlay);
+      l.push(item);
     });
       res.send(l);
   });
