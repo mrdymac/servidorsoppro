@@ -99,6 +99,7 @@ router.get('/', function(req, res) {
                                     normalized: em[0].normalized,
                                     inicio_acompanhamento:g.inicio_acomp,
                                     preco_entrada:getCurrencyMode(g.preco_entrada),
+                                    tickers:em[0].tickers
                                 };
                                 index++;
                                 if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
