@@ -198,8 +198,14 @@ router.get('/', function(req, res) {
 
                 
                 f.id=f._id;
-                if(f.recomendacoes[0].dados_recomendacao!=undefined)
-                  f.num_recomendacao=f.recomendacoes.length.toString();
+                var num_rec=0;
+                if(f.recomendacoes[0].dados_recomendacao!=undefined){
+                  f.recomendacoes.forEach((item)=>{
+                     if(item.publicado)
+                        num_rec++;
+                  });
+                  f.num_recomendacao=num_rec.toString();
+                }
                 else
                   f.num_recomendacao="0";
                delete(f.recomendacoes);
@@ -276,7 +282,7 @@ router.get('/recomendacoes', function(req, res) {
          }
          var lista=[];
          docs[0].recomendacoes.forEach(rec=>{
-            if(rec._id!=undefined)
+            if(rec._id!=undefined && rec.publicado)
             lista.push({data:getDataFormatada(rec.data), id:rec._id});   
             
          });
