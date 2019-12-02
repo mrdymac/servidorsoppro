@@ -137,7 +137,8 @@ router.get('/', function(req, res) {
                         idEmpresa:item.idEmpresa,
                         ultimo_alvo:getCurrencyMode( item.dados_recomendacao[0].values),
                         ultimo_recomendacao: item.recomendacao,
-                        atualizacao:item.data
+                        atualizacao:item.data,
+                        ticker:item.recomendacao.ticker
 
                     })
                });
