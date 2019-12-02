@@ -143,6 +143,8 @@ router.post('/plano/assina', function(req, res, next) {
       retorno=ret;
       var json=JSON.parse(retorno);
       var novaData=new Date(json.expiryTimeMillis);
+    if(p.codigo=='GRATIS')
+      novaData=Date.now() + 100000 * 86400000;
     Users.findOneAndUpdate({email:ema, token:tok},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
       function (a,b){     
         if(a){
