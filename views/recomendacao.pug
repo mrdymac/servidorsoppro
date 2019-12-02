@@ -1,6 +1,6 @@
 extends layout
 block content
-    table  
+    table(class="table")
         thead
             th Data
             th Empresa
@@ -8,6 +8,8 @@ block content
         tbody
         each item in lista
             tr
-                td item.data   
-                td item.empresa
-                td item.publicado
+                td=item.data   
+                td=item.empresa
+                td=item.publicado
+
+    script $("table").DataTable();

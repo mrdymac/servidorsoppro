@@ -35,6 +35,7 @@ block content
                                 button(onclick="deletar('"+item._id+"')" class="btn btn-primary") Excluir
                             td
                                 a(href="./tickers?empresa="+item._id class="btn btn-primary") AddTickers
+                                 a(href="/recomendacao/lista?empresa="+item._id class="btn btn-primary") Add Recomendacao
                                     
                     
     script $("table").DataTable();

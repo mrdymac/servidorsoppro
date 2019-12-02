@@ -4,10 +4,19 @@ var mongo = require('mongodb');
 var  fcm = require ('fcm-notification') ; 
 var FCM = new fcm ('./path/to/privatekkey.json') ; 
 
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express' });
-// });
+router.get('/lista', function(req, res, next) {
+    var id= req.query.empresa;
+    if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
+      var db = require("../db");    
+      var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+      Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
+
+        res.render('recomendacao',{lista:emp.recomendacoes});
+      });
+  
+});
+
 
 router.post('/publicar',function(req,res){
     var db = require("../db");    
