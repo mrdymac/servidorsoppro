@@ -9,20 +9,49 @@ var FCM = new fcm ('./path/to/privatekkey.json') ;
 //   res.render('index', { title: 'Express' });
 // });
 
+router.post('/publicar',function(req,res){
+    var db = require("../db");    
+    var id=req.body.recomendacao; 
+    var publicar=req.body.publicado=="true"?true:false; 
+    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');    
+    var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+    Empresas.findOneAndUpdate({"recomendacoes._id":new mongo.ObjectId(id)},{$set:{"recomendacoes.$.publicado":publicar}},
+    {upsert:true}, function(err, rec){       
+        Users.find({"carteira.id_empresa":rec._id}).lean().exec(function (errr,users){
+            var t=[];
+            users.forEach((user)=>{
+                t.push(user.idNotification);
+            });
+            rec.recomendacoes.forEach(element => {
+                if(element._id != null && element._id.toString()==id){
+                    element.dados_recomendacao.forEach((item)=>{                              
+                        if(item.label.toLowerCase()=="alvo")
+                        alvo="alvo R$ "+getCurrencyMode(item.values);
+                    });
+                    enviaNotificacao(t, element.ticker+"  "+alvo ,  element.recomendacao);
+                }
+            });
+            
+           res.send("{'ok':'saved'}")
+        });
+    });
+    
+});
+
 router.post('/save',function(req,res){
     var db = require("../db");
     var recom=req.body.recomendacao;
     var id=req.body.empresa;  
     var url=req.body.url;
     var texto=req.body.texto;
-    var dat=req.body.data;
+    var dat=getDataFormatada;
     var disc=req.body.disclaimer;
     var tic=req.body.ticker;
 
     var indicadores=req.body.dados_indicadores;
     var rec_data=req.body.dados_recomendacao;
     var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-    var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+   
     
         var rec={
             _id:new mongo.ObjectId(),
@@ -33,29 +62,18 @@ router.post('/save',function(req,res){
             data:dat,
             dados_indicadores:JSON.parse(indicadores),
             dados_recomendacao:JSON.parse(rec_data),
-            ticker:tic
+            ticker:tic,
+            publicado:false
        };
        Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$push:{recomendacoes:rec}},
         {upsert:true}, function(err, doc){
           if (err)
            return res.send(500, { error: err });
 
-        Users.find({"carteira.id_empresa":new mongo.ObjectId(id)}).lean().exec(function (errr,users){
-            var t=[];
-            users.forEach((user)=>{
-                t.push(user.idNotification);
-            });
+       
             
-            var alvo="";
-           
-            rec.dados_recomendacao.forEach((item)=>{
-                              
-                if(item.label.toLowerCase()=="alvo")
-                alvo="alvo R$ "+getCurrencyMode(item.values);
-            });
-            enviaNotificacao(t, tic+"  "+alvo ,  rec.recomendacao);
             return res.send("succesfully saved");
-            });
+            
         });
     });
     

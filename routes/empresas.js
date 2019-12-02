@@ -268,8 +268,12 @@ router.get('/recomendacoes', function(req, res) {
    var db = require("../db");
    var lastid=req.query.id; 
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   Empresas.find({_id:new mongo.ObjectID(lastid)}).lean().exec(
+   Empresas.find({_id:new mongo.ObjectID(lastid),"recomendacoes.publicado":true}).lean().exec(
       function (e, docs) {   
+         if(docs[0]==null){
+            res.send([]);
+            return;
+         }
          var lista=[];
          docs[0].recomendacoes.forEach(rec=>{
             if(rec._id!=undefined)
