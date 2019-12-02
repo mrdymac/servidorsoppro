@@ -3,6 +3,8 @@ var router = express.Router();
 var mongo = require('mongodb');
 
 router.post('/save', function(req, res, next) {
+  if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
     var db = require("../db");
     var cod=req.body.codigo;
     var num_empr=req.body.num_empresas;
@@ -19,6 +21,7 @@ router.post('/save', function(req, res, next) {
   });
 
 router.get('/', function(req, res) {
+  
     var db = require("../db");
     var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
     Planos.find({}).lean().exec((a,plano)=>{
