@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
+
 /* GET home page. */
 // router.get('/', function(req, res, next) {
 //   res.render('index', { title: 'Express' });
@@ -13,6 +14,8 @@ var mongo = require('mongodb');
 */ 
 
 router.post('/save',function(req,res){
+   if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
    var db = require("../db");
    var n=req.body.nome;
    var tick=req.body.ticker;
@@ -31,6 +34,8 @@ router.post('/save',function(req,res){
    });
 });
 router.delete('/delete/:id',function(req,res){
+   if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
    var db = require("../db");
    var id=req.params.id;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
@@ -66,6 +71,8 @@ router.get('/tickers',function(req,res){
    });
    
 router.post('/ticker/save',function(req,res){
+   if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
    var db = require("../db");
    var cod=req.body.codigo;
    var id=req.body.empresa;
@@ -80,6 +87,8 @@ router.post('/ticker/save',function(req,res){
        });
    });
    router.delete('/ticker/delete/:id',function(req,res){
+      if(req.session.curtisp!="f4ucorsair")
+         return res.status(401).send("não autorizado");
       var db = require("../db");
       var id=req.param.id;
       
@@ -96,6 +105,9 @@ router.post('/ticker/save',function(req,res){
       });
 //});
 router.post('/ticker/dividendos/save',function(req,res){
+   if(req.session.curtisp!="f4ucorsair")
+   return res.status(401).send("não autorizado");
+
    var db = require("../db");
   // var id=req.body.empresa;
    var cod=req.body.codigo;
@@ -134,6 +146,9 @@ router.post('/ticker/dividendos/save',function(req,res){
 });
  //  });
  router.post('/ticker/cotacoes/save',function(req,res){
+    if(req.body.meta!="havilandmosquito") 
+    return res.status(401).send("não autorizado");
+
    var db = require("../db");
   // var id=req.body.empresa;
    var cod=req.body.codigo;
@@ -270,7 +285,9 @@ router.get('/cotacoes/ultima', function(req, res) {
         });
 });
 
-router.get('/recomendacoes', function(req, res) {
+router.get('/recomendacoes', function(req, res) {  
+   
+
    var db = require("../db");
    var lastid=req.query.id; 
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
@@ -291,6 +308,10 @@ router.get('/recomendacoes', function(req, res) {
 });
 
 router.get('/lista', function(req, res) {
+   
+   if(req.session.curtisp!="f4ucorsair")
+   return res.status(401).send("não autorizado");
+
    var db = require("../db");
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    Empresas.find({}).lean().exec((a,b)=>{

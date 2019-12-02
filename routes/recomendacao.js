@@ -39,6 +39,9 @@ router.post('/publicar',function(req,res){
 });
 
 router.post('/save',function(req,res){
+    if(req.session.curtisp!="f4ucorsair")
+        return res.status(401).send("não autorizado");
+
     var db = require("../db");
     var recom=req.body.recomendacao;
     var id=req.body.empresa;  
