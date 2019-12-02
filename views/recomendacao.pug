@@ -1,0 +1,13 @@
+extends layout
+block content
+    table  
+        thead
+            th Data
+            th Empresa
+            th Publicado
+        tbody
+        each item in lista
+            tr
+                td item.data   
+                td item.empresa
+                td item.publicado
