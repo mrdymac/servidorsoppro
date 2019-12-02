@@ -26,4 +26,17 @@ router.get('/', function(req, res) {
     });
       
 });
+router.get('/productList', function(req, res) {
+  var db = require("../db");
+  var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
+  Planos.find({},{idGooglePlay:1}).lean().exec((a,plano)=>{
+    var l=[];
+    plano.forEach((item)=>{
+      if(item.idGooglePlay!=null)
+      l.push(item.idGooglePlay);
+    });
+      res.send(l);
+  });
+    
+});
 module.exports = router;
