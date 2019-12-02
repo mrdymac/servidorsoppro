@@ -138,7 +138,7 @@ router.get('/', function(req, res) {
                         ultimo_alvo:getCurrencyMode( item.dados_recomendacao[0].values),
                         ultimo_recomendacao: item.recomendacao,
                         atualizacao:item.data,
-                        ticker:item.recomendacao.ticker
+                        ticker:item.ticker
 
                     })
                });
