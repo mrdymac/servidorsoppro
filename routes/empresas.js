@@ -258,7 +258,7 @@ router.post('/ticker/dividendos/save',function(req,res){
  router.get('/alertas', function(req, res) {
    var db = require("../db");
    var id = req.query.empresa;
-   var Tickers = db.Mongoose.model('empresas', db.TickersSchema, 'empresas');
+   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
    Tickers.findOne({idEmpresa:new mongo.ObjectId(id)},(err,doc)=>{
          console.log(doc);
          if(err)
