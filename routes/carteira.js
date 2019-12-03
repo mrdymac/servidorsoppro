@@ -21,7 +21,7 @@ router.post('/insereEmpresa', function(req, res) {
             else
                 return res.send(500, { error: err });
             
-            Users.findOneAndUpdate({_id:user._id},{$push:{carteira:{id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio, preco_entrada:p_entrada}}},
+            Users.findOneAndUpdate({_id:user._id},{$push:{carteira:{id_empresa:new mongo.ObjectId(id),inicio_acomp:inicio, preco_entrada:p_entrada, alertar:true}}},
             function(err, doc){
             if (err)
                 return res.send(500, { error: err }); 
