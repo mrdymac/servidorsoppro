@@ -147,8 +147,8 @@ router.post('/ticker/dividendos/save',function(req,res){
  //  });
  router.post('/ticker/cotacoes/save',function(req,res){
     console.log(req.body.meta);
-    if(req.body.meta!="havilandmosquito") 
-    return res.status(401).send("não autorizado");
+   //  if(req.body.meta!="havilandmosquito") 
+   //  return res.status(401).send("não autorizado");
     console.log(req.body.meta=="havilandmosquito");
    var db = require("../db");
   // var id=req.body.empresa;
@@ -189,8 +189,8 @@ router.post('/ticker/dividendos/save',function(req,res){
 
   router.post('/ticker/alertas/save',function(req,res){
    console.log(req.body.meta);
-   if(req.body.meta!="havilandmosquito") 
-   return res.status(401).send("não autorizado");
+   // if(req.body.meta!="havilandmosquito") 
+   // return res.status(401).send("não autorizado");
 
   var db = require("../db");
  // var id=req.body.empresa;

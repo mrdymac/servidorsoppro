@@ -5,6 +5,26 @@ var mongo = require('mongodb');
 // router.get('/', function(req, res, next) {
 //   res.render('index', { title: 'Express' });
 // });
+router.post('/alertar', function(req, res) {
+    var db = require("../db");
+    var e=req.body.email;
+    var id=req.body.empresa;    
+    var al=req.body.alertar=="true"?true:false;
+    var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+    Users.findOne({email:e}).lean().exec((err2,user)=>{
+        Tickers.findOne({idEmpresa:new mongo.ObjectId(id)}).exec((err,tic)=>{ 
+          Users.findOneAndUpdate({_id:user._id, "carteira.codigo":tic.codigo},{$set:{"carteira.$.alertar":al}},
+            function(err, doc){
+            if (err)
+                return res.send(500, { error: err }); 
+            return res.send("[{\"ok\":\"saved alertar\"}]");
+            });
+        });
+        
+    });
+});
+
 router.post('/insereEmpresa', function(req, res) {
     var db = require("../db");
     var e=req.body.email;
