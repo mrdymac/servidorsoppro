@@ -15,17 +15,23 @@ router.post('/alertar', function(req, res) {
     var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
     Users.findOne({email:e}).lean().exec((err2,user)=>{
         Tickers.findOne({idEmpresa:new mongo.ObjectId(id)}).exec((err,tic)=>{ 
-          Users.findOneAndUpdate({_id:user._id, "carteira.codigo":tic.codigo},{$set:{"carteira.$.alertar":al}},
+          Users.findOneAndUpdate({_id:user._id, "carteira.id_empresa":tic.idEmpresa},{$set:{"carteira.$.alertar":al}},
+          {upsert:true},
             function(err, doc){
             if (err)
-                return res.send(500, { error: err }); 
+                return res.send(500, { error: err });
+                console.log("Post saved") ;
             return res.send("[{\"ok\":\"saved alertar\"}]");
             });
         });
         
     });
 });
-
+router.get('/alertas', function(req, res) {
+    var db = require("../db");
+    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+    //Empresas.
+});
 router.post('/insereEmpresa', function(req, res) {
     var db = require("../db");
     var e=req.body.email;
@@ -120,7 +126,8 @@ router.get('/', function(req, res) {
                                     normalized: em[0].normalized,
                                     inicio_acompanhamento:g.inicio_acomp,
                                     preco_entrada:getCurrencyMode(g.preco_entrada),
-                                    tickers:em[0].tickers
+                                    tickers:em[0].tickers,
+                                    alertar:g.alertar
                                 };
                                 index++;
                                 if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
