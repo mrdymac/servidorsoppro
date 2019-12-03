@@ -27,11 +27,7 @@ router.post('/alertar', function(req, res) {
         
     });
 });
-router.get('/alertas', function(req, res) {
-    var db = require("../db");
-    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-    //Empresas.
-});
+
 router.post('/insereEmpresa', function(req, res) {
     var db = require("../db");
     var e=req.body.email;

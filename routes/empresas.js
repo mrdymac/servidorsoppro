@@ -254,6 +254,21 @@ router.post('/ticker/dividendos/save',function(req,res){
        });
   }, 3000);
  });
+
+ router.get('/alertas', function(req, res) {
+   var db = require("../db");
+   var id = req.query.empresa;
+   var Tickers = db.Mongoose.model('empresas', db.TickersSchema, 'empresas');
+   Tickers.findOne({idEmpresa:new mongo.ObjectId(id)},(err,doc)=>{
+         console.log(doc);
+         if(err)
+            return res.status(500).send([{'erro':'erro'}]);
+         var lista=[];
+         for(var i=0;i<doc.alertas.length;i++)
+         lista.push(doc.alertas[i]);
+         return res.status(200).send(lista);
+   })
+});
 //});
 router.get('/', function(req, res) {
    var db = require("../db");
