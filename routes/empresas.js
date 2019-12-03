@@ -149,7 +149,7 @@ router.post('/ticker/dividendos/save',function(req,res){
     console.log(req.body.meta);
     if(req.body.meta!="havilandmosquito") 
     return res.status(401).send("não autorizado");
-
+    console.log(req.body.meta=="havilandmosquito");
    var db = require("../db");
   // var id=req.body.empresa;
    var cod=req.body.codigo;
@@ -220,7 +220,7 @@ router.post('/ticker/dividendos/save',function(req,res){
                      
                         Empresas.findOne({_id:new mongo.ObjectId(ti.idEmpresa)},
                          function(err, rec){       
-                            Users.find({"carteira.id_empresa":rec._id}).lean().exec(function (errr,users){
+                            Users.find({"carteira.id_empresa":rec._id,"carteira.alertar":true}).lean().exec(function (errr,users){
                                 var listaNotification=[];
                                 users.forEach((user)=>{
                                     listaNotification.push(user.idNotification);
