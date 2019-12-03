@@ -146,6 +146,7 @@ router.post('/ticker/dividendos/save',function(req,res){
 });
  //  });
  router.post('/ticker/cotacoes/save',function(req,res){
+    console.log(req.body.meta);
     if(req.body.meta!="havilandmosquito") 
     return res.status(401).send("não autorizado");
 
@@ -185,6 +186,74 @@ router.post('/ticker/dividendos/save',function(req,res){
         });
    }, 3000);
   });
+
+  router.post('/ticker/alertas/save',function(req,res){
+   console.log(req.body.meta);
+   if(req.body.meta!="havilandmosquito") 
+   return res.status(401).send("não autorizado");
+
+  var db = require("../db");
+ // var id=req.body.empresa;
+  var cod=req.body.codigo;
+  var dat=req.body.data;
+  var val=req.body.valor;  
+  var st=req.body.stop;  
+  var rec=req.body.recomendacao;  
+ 
+  var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+  setTimeout(()=>{
+      Tickers.findOne({
+           // _id:new mongo.ObjectId(id),
+           "codigo":cod, "alertas.data":dat},
+           //{$set:{"cotacoes.$.fechamento":parseFloat(val)}},
+           
+         function(err, doc){
+         //  console.log(doc);
+           if(doc==null)
+            Tickers.findOneAndUpdate({
+                  // _id:new mongo.ObjectId(id),
+                  "codigo":cod},
+                  {$push:{"alertas":{data:dat,limite:parseFloat(val),recomendacao:rec, stop:st}}},
+                  function(err2,ti){
+                     if (err2)
+                        return res.send(500, { error: err2 });
+                     
+                        Empresas.findOne({_id:new mongo.ObjectId(ti.idEmpresa)},
+                         function(err, rec){       
+                            Users.find({"carteira.id_empresa":rec._id}).lean().exec(function (errr,users){
+                                var listaNotification=[];
+                                users.forEach((user)=>{
+                                    listaNotification.push(user.idNotification);
+                                }); 
+                                if(listaNotification.length==0)
+                                    return res.send("{'ok':'sem usuarios'}");
+                                var rec="";
+                                var msg="";
+                                if(recomendacao=="COMPRA"){
+                                    rec="COMPRAR "+ti.codigo;
+                                    msg="Oportunidade em R\$ " +val.replace(".",",")+" e Stop em R\$ "+st.replace(".",",");                                    
+                                }else if(recomendacao=="ALVO"){
+                                    rec=ti.codigo+" ALVO ATINGIDO";
+                                    msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
+                                }
+                                else if(recomendacao=="NEWSTOP"){
+                                    rec="NOVO ALVO "+ti.codigo;
+                                    msg="Ajuste o stop para de R\$ "+st.replace(".",",");
+                                 }else if(recomendacao=="VENDA"){
+                                    rec="VENDA "+ti.codigo;
+                                    msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
+                                 }
+                                enviaNotificacao(listaNotification, msg ,  rec);
+                               res.send("{'ok':'saved'}");
+                            });
+                        });
+                  
+                    // return res.status(200).send("[{\"ok\":\"saved alertas\"}]");
+        });         
+         
+       });
+  }, 3000);
+ });
 //});
 router.get('/', function(req, res) {
    var db = require("../db");

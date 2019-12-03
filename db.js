@@ -45,7 +45,7 @@ var planoSchema=new mongoose.Schema({
 var tickersSchema=new mongoose.Schema({
     _id:Schema.Types.ObjectId,
     idEmpresa:Schema.Types.ObjectId,    codigo: String,
-   
+    alertas:[{data:String, valor: Number, recomendacao:String, stop:Number}],
     cotacoes:[{data:String, fechamento: Number}],
     dividendos: [{data:String, valor: Number}]
 },{collection:'tickers'}
