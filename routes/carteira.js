@@ -8,7 +8,8 @@ var mongo = require('mongodb');
 router.post('/alertar', function(req, res) {
     var db = require("../db");
     var e=req.body.email;
-    var id=req.body.empresa;    
+    var id=req.body.empresa;
+    
     var al=req.body.alertar=="true"?true:false;
     var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
     var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
