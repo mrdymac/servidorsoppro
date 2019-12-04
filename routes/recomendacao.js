@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var  fcm = require ('fcm-notification') ; 
-var FCM = new fcm ('./path/to/privatekkey.json') ; 
+
 
 router.get('/lista', function(req, res, next) {
     var id= req.query.empresa;
@@ -178,6 +178,7 @@ function getDataFormatada(valor){
     return data.substr(6,2)+"/"+data.substr(4,2)+"/"+data.substr(0,4)
 }
 function enviaNotificacao(tokens, msg, title){
+    var FCM = new fcm ('./path/to/privatekkey.json') ; 
     var message = {       
         notification:{
           title : title,

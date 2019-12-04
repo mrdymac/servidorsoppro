@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
+ var  fcm = require ('fcm-notification') ; 
+ 
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -198,9 +200,10 @@ router.post('/ticker/dividendos/save',function(req,res){
   var dat=req.body.data;
   var val=req.body.valor;  
   var st=req.body.stop;  
-  var rec=req.body.recomendacao;  
- 
+  var reco=req.body.recomendacao;  
+  var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   setTimeout(()=>{
       Tickers.findOne({
            // _id:new mongo.ObjectId(id),
@@ -209,11 +212,13 @@ router.post('/ticker/dividendos/save',function(req,res){
            
          function(err, doc){
          //  console.log(doc);
-           if(doc==null)
+         if(doc!=null)
+            return res.send([]);
+         if(doc==null)
             Tickers.findOneAndUpdate({
                   // _id:new mongo.ObjectId(id),
                   "codigo":cod},
-                  {$push:{"alertas":{data:dat,limite:parseFloat(val),recomendacao:rec, stop:st}}},
+                  {$push:{"alertas":{data:dat,limite:parseFloat(val),recomendacao:reco, stop:st}}},
                   function(err2,ti){
                      if (err2)
                         return res.send(500, { error: err2 });
@@ -227,24 +232,24 @@ router.post('/ticker/dividendos/save',function(req,res){
                                 }); 
                                 if(listaNotification.length==0)
                                     return res.send("{'ok':'sem usuarios'}");
-                                var rec="";
+                                var recc="";
                                 var msg="";
-                                if(recomendacao=="COMPRA"){
-                                    rec="COMPRAR "+ti.codigo;
+                                if(reco=="COMPRA"){
+                                    recc="COMPRAR "+ti.codigo;
                                     msg="Oportunidade em R\$ " +val.replace(".",",")+" e Stop em R\$ "+st.replace(".",",");                                    
-                                }else if(recomendacao=="ALVO"){
-                                    rec=ti.codigo+" ALVO ATINGIDO";
+                                }else if(reco=="ALVO"){
+                                    recc=ti.codigo+" ALVO ATINGIDO";
                                     msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
                                 }
-                                else if(recomendacao=="NEWSTOP"){
-                                    rec="NOVO ALVO "+ti.codigo;
+                                else if(rec=="NEWSTOP"){
+                                    recc="NOVO ALVO "+ti.codigo;
                                     msg="Ajuste o stop para de R\$ "+st.replace(".",",");
-                                 }else if(recomendacao=="VENDA"){
-                                    rec="VENDA "+ti.codigo;
+                                 }else if(reco=="VENDA"){
+                                    recc="VENDA "+ti.codigo;
                                     msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
                                  }
-                                enviaNotificacao(listaNotification, msg ,  rec);
-                               res.send("{'ok':'saved'}");
+                                enviaNotificacao(listaNotification, msg ,  recc);
+                               res.send([{'ok':'saved'}]);
                             });
                         });
                   
@@ -431,6 +436,24 @@ function getUltimaCotacao(tick){
        }
    )[tick.cotacoes.length-1];
    return cotacao;
+}
+
+function enviaNotificacao(tokens, msg, title){
+   var FCM = new fcm ('./path/to/privatekkey.json') ; 
+   var message = {       
+       notification:{
+         title : title,
+         body : msg
+       }
+     };
+     FCM.sendToMultipleToken(message, tokens, function(err, response) {
+         if(err){
+             console.log('err--', err);
+         }else {
+             console.log('response-----', response);
+         }
+      
+     })
 }
 module.exports = router;
 
