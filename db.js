@@ -3,7 +3,8 @@ var mongoose = require('mongoose');
 //  mongoose.connect('mongodb://adminmongo:Curtisp40@kamino.mongodb.umbler.com:45553/soprodb');
  mongoose.connect("mongodb+srv://adminmongo:Curtisp40@cluster0-qwok3.gcp.mongodb.net/soprodb?retryWrites=true&w=majority");
 const Schema = mongoose.Schema;
-
+var  fcm = require ('fcm-notification') ; 
+var Fcm = new fcm ('./path/to/privatekkey.json') ;
 var adminSchema = new mongoose.Schema({
     login: String,
     senha: String,
@@ -45,9 +46,12 @@ var planoSchema=new mongoose.Schema({
 var tickersSchema=new mongoose.Schema({
     _id:Schema.Types.ObjectId,
     idEmpresa:Schema.Types.ObjectId,    codigo: String,
-    alertas:[{data:String, valor: Number, recomendacao:String, stop:Number}],
+    alertas:[{data:String, limite: Number, recomendacao:String, stop:Number}],
     cotacoes:[{data:String, fechamento: Number}],
     dividendos: [{data:String, valor: Number}]
 },{collection:'tickers'}
 );
-module.exports = { Mongoose: mongoose, EmpresasSchema: empresasSchema, UsersSchema:usersSchema, PlanoSchema: planoSchema, TickersSchema:tickersSchema } 
+module.exports = { Mongoose: mongoose, 
+    EmpresasSchema: empresasSchema, UsersSchema:usersSchema, 
+    PlanoSchema: planoSchema, TickersSchema:tickersSchema,
+    FCM:Fcm } 

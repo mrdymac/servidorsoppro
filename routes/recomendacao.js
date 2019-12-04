@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
-var  fcm = require ('fcm-notification') ; 
 
 
 router.get('/lista', function(req, res, next) {
@@ -178,14 +177,14 @@ function getDataFormatada(valor){
     return data.substr(6,2)+"/"+data.substr(4,2)+"/"+data.substr(0,4)
 }
 function enviaNotificacao(tokens, msg, title){
-    var FCM = new fcm ('./path/to/privatekkey.json') ; 
+    var db = require("../db");
     var message = {       
         notification:{
           title : title,
           body : msg
         }
       };
-      FCM.sendToMultipleToken(message, tokens, function(err, response) {
+      db.FCM.sendToMultipleToken(message, tokens, function(err, response) {
           if(err){
               console.log('err--', err);
           }else {

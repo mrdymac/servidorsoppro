@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
- var  fcm = require ('fcm-notification') ; 
+
  
 
 /* GET home page. */
@@ -218,7 +218,7 @@ router.post('/ticker/dividendos/save',function(req,res){
             Tickers.findOneAndUpdate({
                   // _id:new mongo.ObjectId(id),
                   "codigo":cod},
-                  {$push:{"alertas":{data:dat,limite:parseFloat(val),recomendacao:reco, stop:st}}},
+                  {$push:{"alertas":{data:dat,limite:parseFloat(val),recomendacao:reco, stop:parseFloat(st)}}},
                   function(err2,ti){
                      if (err2)
                         return res.send(500, { error: err2 });
@@ -236,17 +236,17 @@ router.post('/ticker/dividendos/save',function(req,res){
                                 var msg="";
                                 if(reco=="COMPRA"){
                                     recc="COMPRAR "+ti.codigo;
-                                    msg="Oportunidade em R\$ " +val.replace(".",",")+" e Stop em R\$ "+st.replace(".",",");                                    
+                                    msg="Oportunidade em "+getCurrencyMode(val)+" e Stop em "+getCurrencyMode(st);                                    
                                 }else if(reco=="ALVO"){
                                     recc=ti.codigo+" ALVO ATINGIDO";
-                                    msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
+                                    msg="Alvo de "+getCurrencyMode(val)+" foi atingido.";
                                 }
                                 else if(rec=="NEWSTOP"){
                                     recc="NOVO ALVO "+ti.codigo;
-                                    msg="Ajuste o stop para de R\$ "+st.replace(".",",");
+                                    msg="Ajuste o stop para de "+getCurrencyMode(st);
                                  }else if(reco=="VENDA"){
                                     recc="VENDA "+ti.codigo;
-                                    msg="Alvo de R\$ "+val.replace(".",",")+" foi atingido.";
+                                    msg="Alvo de "+getCurrencyMode(val)+" foi atingido.";
                                  }
                                 enviaNotificacao(listaNotification, msg ,  recc);
                                res.send([{'ok':'saved'}]);
@@ -269,8 +269,27 @@ router.post('/ticker/dividendos/save',function(req,res){
          if(err)
             return res.status(500).send([{'erro':'erro'}]);
          var lista=[];
-         for(var i=0;i<doc.alertas.length;i++)
-         lista.push(doc.alertas[i]);
+         var topAlerts=doc.alertas.sort(
+            (a,b)=>{
+                if ( a.data < b.data ){
+                    return -1;
+                  }
+                  if ( a.data > b.data ){
+                    return 1;
+                  }
+                  return 0;
+            }
+        );
+         var total=doc.alertas.length;
+         if(total>5)
+            total=5;
+         for(var i=0;i<total;i++)
+         lista.push({
+            recomendacao:topAlerts[i].recomendacao,
+            data:getDataFormatada(topAlerts[i].data),
+            stop:getCurrencyMode(topAlerts[i].stop),
+            limite:getCurrencyMode(topAlerts[i].limite)
+         });
          return res.status(200).send(lista);
    })
 });
@@ -439,14 +458,14 @@ function getUltimaCotacao(tick){
 }
 
 function enviaNotificacao(tokens, msg, title){
-   var FCM = new fcm ('./path/to/privatekkey.json') ; 
+   var db = require("../db");
    var message = {       
        notification:{
          title : title,
          body : msg
        }
      };
-     FCM.sendToMultipleToken(message, tokens, function(err, response) {
+     db.FCM.sendToMultipleToken(message, tokens, function(err, response) {
          if(err){
              console.log('err--', err);
          }else {
