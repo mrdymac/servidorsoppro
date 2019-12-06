@@ -1,0 +1,32 @@
+extends layout
+block content
+    h1=empresa
+    form(action="",method="POST")
+        input(type="hidden", name="empresa", value=idEmpresa)
+        //- input(type="hidden", name="dados_recomendacao")
+        label Recomendação
+        input(type="Text",class="form-control",name="recomendacao")
+        label URL Podcast
+        input(type="Text",class="form-control",name="url")
+        label Data
+        input(type="Text",class="form-control",name="data")
+        label Ticker
+        input(type="Text",class="form-control",name="ticker")
+        abel Autor
+        input(type="Text",class="form-control",name="disclaimer")
+        input(type="Text",class="form-control",name="label", id="label")
+        input(type="Text",class="form-control",name="values", id="values")
+        textarea(name="texto")
+        button(class="btn btn-primary", onclick="envia()") salvar
+    script.
+        CKEDITOR.replace( 'texto' );
+        function envia(){
+            var bod=$('form').serialize();
+            bod+="&dados_recomendacao=[{\"label\":\""+$('#label').val()+"\", \"values\":"+$('#values').val()+"}]";            
+            $.post("./save",bod,function(e){
+                    location.reload();
+            });
+        }
+    
+    
+

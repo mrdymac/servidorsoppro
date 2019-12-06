@@ -11,11 +11,46 @@ router.get('/lista', function(req, res, next) {
       var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
       Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
 
-        res.render('recomendacao',{lista:emp.recomendacoes});
+        res.render('recomendacao',{lista:emp.recomendacoes,empresa:emp.nome,idEmpresa:emp._id });
       });
   
 });
+router.get('/novo', function(req, res, next) {
+  
+    var id= req.query.empresa;
+    if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
+      var db = require("../db");    
+      var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+      Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
 
+        res.render('formRecomendacao',{idEmpresa:id, empresa:emp.nome });
+      });
+  
+});
+router.get('/visualizar', function(req, res, next) {
+  
+    var id= req.query.id;
+    if(req.session.curtisp!="f4ucorsair")
+      return res.status(401).send("não autorizado");
+      var db = require("../db");    
+      var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+      Empresas.findOne({"recomendacoes._id":new mongo.ObjectId(id)},{"recomendacoes.$":1}).lean().exec((e,emp)=>{
+
+        res.render('visualizarRecomendacao',{recomendacao:emp.recomendacoes[0], empresa:emp.nome });
+      });
+  
+});
+router.get('/excluir',function(req,res){
+    var db = require("../db");    
+    var id=req.query.id; 
+    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');    
+    Empresas.findOneAndUpdate({"recomendacoes._id":new mongo.ObjectId(id)},{$pull:{recomendacoes:{"_id":new mongo.ObjectId(id)}}},(e,r)=>{
+        if (e)
+            return e;
+        res.send({"ok":"ok"});
+    })
+});
 
 router.post('/publicar',function(req,res){
     var db = require("../db");    
@@ -31,7 +66,7 @@ router.post('/publicar',function(req,res){
                 t.push(user.idNotification);
             });
             rec.recomendacoes.forEach(element => {
-                if(element._id != null && element._id.toString()==id){
+                if(element._id != null && element._id.toString()==id && publicar){
                     element.dados_recomendacao.forEach((item)=>{                              
                         if(item.label.toLowerCase()=="alvo")
                         alvo="alvo R$ "+getCurrencyMode(item.values);
@@ -55,7 +90,7 @@ router.post('/save',function(req,res){
     var id=req.body.empresa;  
     var url=req.body.url;
     var texto=req.body.texto;
-    var dat=getDataFormatada;
+    var dat=req.body.data;
     var disc=req.body.disclaimer;
     var tic=req.body.ticker;
 
@@ -71,7 +106,7 @@ router.post('/save',function(req,res){
             texto:texto,
             autor:disc,
             data:dat,
-            dados_indicadores:JSON.parse(indicadores),
+            //dados_indicadores:JSON.parse(indicadores),
             dados_recomendacao:JSON.parse(rec_data),
             ticker:tic,
             publicado:false
@@ -83,7 +118,7 @@ router.post('/save',function(req,res){
 
        
             
-            return res.send("succesfully saved");
+            return res.redirect("/recomendacao/lista?empresa="+id);
             
         });
     });
