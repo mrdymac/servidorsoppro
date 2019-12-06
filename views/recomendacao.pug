@@ -5,14 +5,16 @@ block content
     a(href="./novo?empresa="+idEmpresa, class="btn btn-primary") Novo
     table(class="table")
         thead
-            th Data   
+            th Data 
+            th Ticker  
             th Publicado 
             th Recomendação       
             
         tbody
         each item in lista
             tr
-                td=item.data.substring(6,8)+"/"+item.data.substring(4,6)+"/"+item.data.substring(0,4)                 
+                td=item.data.substring(6,8)+"/"+item.data.substring(4,6)+"/"+item.data.substring(0,4) 
+                td=item.ticker                
                 td
                     input(type="checkbox",checked=item.publicado, disabled=true)
                 td

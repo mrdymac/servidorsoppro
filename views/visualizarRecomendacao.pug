@@ -3,7 +3,11 @@ block content
     
 
 
-    h2=recomendacao.recomendacao
+    h2=recomendacao.ticker
+    label Recomendação:
+    span=recomendacao.recomendacao
+    br
+    br
     if !recomendacao.publicado 
         button(onclick="publicar('"+recomendacao._id+"',true)", class="btn btn-primary") Publicar
     else
@@ -14,9 +18,11 @@ block content
             button(onclick="excluir('"+recomendacao._id+"',false)", class="btn btn-primary") Excluir
     br
     br
+    label Data:
     span=recomendacao.data.substring(6,8)+"/"+recomendacao.data.substring(4,6)+"/"+recomendacao.data.substring(0,4)
     br
     br
+    label Texto:
     p!=recomendacao.texto
 
     script. 

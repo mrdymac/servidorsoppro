@@ -148,7 +148,7 @@ router.get('/', function(req, res) {
         }
             
            emps[0].recomendacoes.forEach(rec => {
-               if(rec._id!=undefined){
+               if(rec._id!=undefined && rec.publicado){
                 reco={
                    id:rec._id,
                    logo: emps[0].logo,
@@ -177,6 +177,7 @@ router.get('/', function(req, res) {
            if(id==undefined || id==""){
                 var l=[];
                lista.forEach(item=>{
+                   
                     l.push({
                         id:item.id,
                         nome:item.empresa,
