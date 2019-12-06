@@ -10,14 +10,15 @@ router.post("/signin",function(req,res){
   var tok=req.body.token;
   var idNot=req.body.idNotification;
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-  Users.findOneAndUpdate({"email":e},{token:tok,idNotification:idNot},function(e){
+  Users.findOneAndUpdate({"email":e},{token:tok,idNotification:idNot},function(e,u){
      if (e) {
           console.log("Error! " + err.message);
+          res.send("[{\"erro\":\"erro\"}]");
           return err;
       }
       else {
           console.log("Post saved");
-        res.send("[{\"ok\":\"saved\"}]");
+        res.send([{id:u._id}]);
       }
   });
 });
