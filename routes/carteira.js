@@ -180,8 +180,7 @@ function getUltimaRecomendacao(em){
     });
     em.recomendacoes.forEach(element => {
         if(element.publicado){
-            reco=element;
-            break;
+            reco=element;            
         }
         
     });
