@@ -36,7 +36,7 @@ block content
         function excluir(id){
             if(confirm("Deseja Excluir?",id))
                 $.get("./excluir?id="+id, function(){
-                    location.reload();
+                    documento.location="/empresas/lista";
                 });
 
         }

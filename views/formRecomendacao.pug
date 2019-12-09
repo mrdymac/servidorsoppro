@@ -20,12 +20,15 @@ block content
         label Alvo         
         input(type="Text",class="form-control",name="values", id="alvo", required=true)
         label Texto
-        textarea(name="texto")
-        button(class="btn btn-primary", onclick="envia()") salvar
+       
+    textarea(name="texto" id="texto")
+    button(class="btn btn-primary", onclick="envia()") salvar
+        
     script.
         CKEDITOR.replace( 'texto' );
         function envia(){
             var bod=$('form').serialize();
+            bod+="&texto="+CKEDITOR.instances.texto.getData();;
             bod+="&dados_recomendacao=[{\"label\":\"alvo\", \"values\":"+$('#alvo').val()+"}]";            
             $.post("./save",bod,function(e){
                     document.location="/recomendacao/lista?empresa="+$("#empresa").val();
