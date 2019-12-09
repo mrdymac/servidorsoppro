@@ -24,6 +24,9 @@ router.post('/save',function(req,res){
    var lo=req.body.logo;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[{}],normalized:n.toLowerCase(),tickers:tick});
+  
+   var id=req.body.id;  
+   if(id=="") 
    empresa.save(function (err) {
       if (err) {
           console.log("Error! " + err.message);
@@ -34,6 +37,11 @@ router.post('/save',function(req,res){
         res.redirect("/empresas?page=1&id="+empresa._id);
       }
    });
+   else  
+      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$set:{nome:n,logo:lo,tickers:tick,normalized:n.toLowerCase()}}).lean().exec((a,b)=>{
+         res.redirect("/empresas?page=1&id="+empresa._id);
+      });
+   
 });
 router.delete('/delete/:id',function(req,res){
    if(req.session.curtisp!="f4ucorsair")
@@ -55,6 +63,8 @@ router.delete('/delete/:id',function(req,res){
    });
 });
 router.get('/tickers',function(req,res){
+   if(req.session.curtisp!="f4ucorsair")
+   return res.redirect("/login");
    var db = require("../db");   
    var id=req.query.empresa;
    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
@@ -85,19 +95,19 @@ router.post('/ticker/save',function(req,res){
              {upsert:true}, function(err, doc){
          if (err)
           return res.send(500, { error: err });
-         return res.redirect("/tickers");
+          return res.redirect("/empresas/tickers?empresa="+id);
        });
    });
    router.delete('/ticker/delete/:id',function(req,res){
       if(req.session.curtisp!="f4ucorsair")
          return res.status(401).send("não autorizado");
       var db = require("../db");
-      var id=req.param.id;
+      var id=req.params.id;
       
       var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
    // Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,empresa)=>{
          //empresa.tickers.push({codigo:cod,cotacoes:[]});
-         Tickers.findOneAndDelete({_id:id},
+         Tickers.findOneAndDelete({_id:new mongo.ObjectID(id)},
                 function(err, doc){
                   if (err)
                   return res.send(500, { error: err });
@@ -424,6 +434,19 @@ router.get('/lista', function(req, res) {
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    Empresas.find({}).lean().exec((a,b)=>{
          res.render("empresas",{lista:b});
+   });   
+});
+
+router.get('/editar/:id', function(req, res) {
+   
+   if(req.  session.curtisp!="f4ucorsair")
+   return res.redirect("/login");
+
+   var db = require("../db");
+   var id=req.params.id;
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((a,b)=>{
+         res.send({id:id,nome:b.nome,url:b.logo,tickers:b.tickers});
    });   
 });
 

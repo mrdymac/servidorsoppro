@@ -5,16 +5,17 @@ block content
         form(action="./save" style="width:100%" method="POST")
             div(class="row" style="padding:20px")
                 div(class="col-sm-12 form-group")
+                    input(type="hidden" name="id" id="id")            
                     label(class="label") Nome:                 
-                    input(type="text" name="nome" class="form-control col-sm-12" required)            
+                    input(type="text" name="nome" class="form-control col-sm-12" id="nome" required)            
                 
                     label(class="label") URL Logo: 
-                    input(type="text" name="logo"  class="form-control col-sm-12" required)
+                    input(type="text" name="logo"  class="form-control col-sm-12" id="logo" required)
                 
                     label(class="label") Tickers: 
-                    input(type="text" name="ticker"  class="form-control col-sm-12" required)
+                    input(type="text" name="ticker"  class="form-control col-sm-12" id="ticker" required)
                    
-                    input(type="submit" value="salvar" class="btn btn-primary" style="margin: 20px; width:100px" )
+                    input(type="submit" value="salvar" class="btn btn-primary"  style="margin: 20px; width:100px" )
         
     div(class="row")
         div(class="col-sm-12")
@@ -32,10 +33,12 @@ block content
                             td=item.nome
                             td=item.tickers
                             td
-                                button(onclick="deletar('"+item._id+"')" class="btn btn-primary") Excluir
+                                button(onclick="deletar('"+item._id+"')" class="btn btn-primary" style="margin-right:10px") Excluir
+                                button(onclick="editar('"+item._id+"');" class="btn btn-primary") Editar
                             td
-                                a(href="./tickers?empresa="+item._id class="btn btn-primary") AddTickers
-                                 a(href="/recomendacao/lista?empresa="+item._id class="btn btn-primary") Add Recomendacao
+                                a(href="./tickers?empresa="+item._id class="btn btn-primary" style="margin-right:10px") AddTickers
+                                a(href="/recomendacao/lista?empresa="+item._id class="btn btn-primary") Add Recomendacao
+                               
                                     
                     
     script $("table").DataTable();
@@ -48,8 +51,20 @@ block content
                 success: function(result) {
                     location.reload();
                 }
-            });
-            
-            }
+            });            
+        }
+        function editar(val){
+           
+            $.ajax({
+                url: './editar/'+val,
+                type: 'GET',
+                success: function(result) {
+                    $("#logo").val(result.url);
+                    $("#id").val(result.id);
+                    $("#nome").val(result.nome);
+                    $("#ticker").val(result.tickers);
+                }
+            });            
+        }
     
                         
