@@ -418,7 +418,7 @@ router.get('/recomendacoes', function(req, res) {
 router.get('/lista', function(req, res) {
    
    if(req.session.curtisp!="f4ucorsair")
-   return res.status(401).send("não autorizado");
+   return res.redirect("/login");
 
    var db = require("../db");
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');

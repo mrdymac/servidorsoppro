@@ -6,12 +6,14 @@ var mongo = require('mongodb');
 router.get('/lista', function(req, res, next) {
     var id= req.query.empresa;
     if(req.session.curtisp!="f4ucorsair")
-      return res.status(401).send("não autorizado");
+      return res.redirect("/login");
       var db = require("../db");    
       var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
       Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
-
-        res.render('recomendacao',{lista:emp.recomendacoes,empresa:emp.nome,idEmpresa:emp._id });
+        if(emp.recomendacoes[0]._id!=undefined)
+            res.render('recomendacao',{lista:emp.recomendacoes,empresa:emp.nome,idEmpresa:emp._id });
+        else
+            res.redirect("./novo?empresa="+id);
       });
   
 });
@@ -19,7 +21,7 @@ router.get('/novo', function(req, res, next) {
   
     var id= req.query.empresa;
     if(req.session.curtisp!="f4ucorsair")
-      return res.status(401).send("não autorizado");
+      return res.redirect("/login");
       var db = require("../db");    
       var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
       Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
@@ -32,7 +34,7 @@ router.get('/visualizar', function(req, res, next) {
   
     var id= req.query.id;
     if(req.session.curtisp!="f4ucorsair")
-      return res.status(401).send("não autorizado");
+      return res.redirect("/login");
       var db = require("../db");    
       var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
       Empresas.findOne({"recomendacoes._id":new mongo.ObjectId(id)},{"recomendacoes.$":1}).lean().exec((e,emp)=>{
@@ -42,6 +44,8 @@ router.get('/visualizar', function(req, res, next) {
   
 });
 router.get('/excluir',function(req,res){
+    if(req.session.curtisp!="f4ucorsair")
+    return res.status(401);
     var db = require("../db");    
     var id=req.query.id; 
     var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');    
