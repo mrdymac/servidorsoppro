@@ -116,9 +116,9 @@ router.get('/', function(req, res) {
                                     nome: em[0].nome,
                                     logo:em[0].logo,
                                     cotacao_atual:getCurrencyMode(getUltimaCotacao(tick[0])),
-                                    ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
-                                    ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
-                                    atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
+                                    ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?null:getUltimaRecomendacao(em[0]).recomendacao,
+                                    ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?null:getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
+                                    atualizacao:getUltimaRecomendacao(em[0])==undefined?null:getDataFormatada(getUltimaRecomendacao(em[0]).data), 
                                     normalized: em[0].normalized,
                                     inicio_acompanhamento:g.inicio_acomp,
                                     preco_entrada:getCurrencyMode(g.preco_entrada),
@@ -168,7 +168,7 @@ router.get('/', function(req, res) {
        
 }
 function getUltimaRecomendacao(em){
-    var reco;
+    var reco=undefined;
     em.recomendacoes.sort((a,b)=>{
         if ( a.data < b.data ){
             return -1;
