@@ -2,7 +2,7 @@ extends layout
 block content
     h1=empresa
     form(action="",method="POST")
-        input(type="hidden", name="empresa", value=idEmpresa)
+        input(type="hidden", name="empresa",id="empresa", value=idEmpresa)
         //- input(type="hidden", name="dados_recomendacao")
         label Recomendação
         select(class="form-control",name="recomendacao", required=true)
@@ -28,7 +28,7 @@ block content
             var bod=$('form').serialize();
             bod+="&dados_recomendacao=[{\"label\":\"alvo\", \"values\":"+$('#alvo').val()+"}]";            
             $.post("./save",bod,function(e){
-                    location.reload();
+                    document.location="/recomendacao/lista?empresa="+$("#empresa").val();
             });
         }
     
