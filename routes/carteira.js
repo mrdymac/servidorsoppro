@@ -168,7 +168,8 @@ router.get('/', function(req, res) {
        
 }
 function getUltimaRecomendacao(em){
-    return em.recomendacoes.sort((a,b)=>{
+    var reco;
+    em.recomendacoes.sort((a,b)=>{
         if ( a.data < b.data ){
             return -1;
           }
@@ -176,7 +177,15 @@ function getUltimaRecomendacao(em){
             return 1;
           }
           return 0;
-    })[em.recomendacoes.length-1];
+    });
+    em.recomendacoes.forEach(element => {
+        if(element.publicado){
+            reco=element;
+            break;
+        }
+        
+    });
+    return reco;
 }
 function getUltimoAlvo(rec){
     var alvo="";
