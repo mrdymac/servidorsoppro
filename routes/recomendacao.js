@@ -10,7 +10,7 @@ router.get('/lista', function(req, res, next) {
       var db = require("../db");    
       var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
       Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((e,emp)=>{
-        if(emp.recomendacoes[0]._id!=undefined)
+        if(emp.recomendacoes[0]!=null && emp.recomendacoes[0]._id!=undefined)
             res.render('recomendacao',{lista:emp.recomendacoes,empresa:emp.nome,idEmpresa:emp._id });
         else
             res.redirect("./novo?empresa="+id);
