@@ -332,7 +332,7 @@ router.get('/', function(req, res) {
                 
                 f.id=f._id;
                 var num_rec=0;
-                if(f.recomendacoes[0].dados_recomendacao!=undefined){
+                if(f.recomendacoes[0]!=undefined && f.recomendacoes[0].dados_recomendacao!=undefined){
                   f.recomendacoes.forEach((item)=>{
                      if(item.publicado)
                         num_rec++;
