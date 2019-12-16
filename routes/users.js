@@ -319,22 +319,22 @@ function getAuthenticatedClient() {
 }
 
 
-var d=Date.now() + 30 * 86400000;
-var ret="{\r\n  \"kind\": \"androidpublisher#subscriptionPurchase\","+
-"\r\n  \"startTimeMillis\": "+d+",\r\n  \"expiryTimeMillis\": "+d+",\r\n "+
-"\"autoResumeTimeMillis\": "+d+",\r\n  \"autoRenewing\": false,\r\n "
-+" \"priceCurrencyCode\": \"\",\r\n  \"priceAmountMicros\": 10,\r\n"
-+"  \"introductoryPriceInfo\": {\r\n    \"introductoryPriceCurrencyCode\": \"\",\r\n   "+
-" \"introductoryPriceAmountMicros\": 10,\r\n    \"introductoryPricePeriod\": \"\",\r\n  "+
-" \"introductoryPriceCycles\": 1\r\n  },\r\n  \"countryCode\": \"\",\r\n "+
-" \"developerPayload\": \"\",\r\n  \"paymentState\": 1,\r\n "+
-" \"cancelReason\": 1,\r\n  \"userCancellationTimeMillis\": "+d+",\r\n  "+
-"\"cancelSurveyResult\": {\r\n    \"cancelSurveyReason\": 1,\r\n    "+
-"\"userInputCancelReason\": \"\"\r\n  },\r\n  \"orderId\": \"\",\r\n  "+
-"\"linkedPurchaseToken\": \"\",\r\n  \"purchaseType\": 1,\r\n  "+
-"\"priceChange\": {\r\n    \"newPrice\": {\r\n      \"priceMicros\": \"\",\r\n "+
-"\"currency\": \"\"\r\n    },\r\n    \"state\": 1\r\n  },\r\n "+
-" \"profileName\": \"\",\r\n  \"emailAddress\": \"\",\r\n "+
-" \"givenName\": \"\",\r\n  \"familyName\": \"\",\r\n  "+
-"\"profileId\": \"\",\r\n  \"acknowledgementState\": 1\r\n}";
+// var d=Date.now() + 30 * 86400000;
+// var ret="{\r\n  \"kind\": \"androidpublisher#subscriptionPurchase\","+
+// "\r\n  \"startTimeMillis\": "+d+",\r\n  \"expiryTimeMillis\": "+d+",\r\n "+
+// "\"autoResumeTimeMillis\": "+d+",\r\n  \"autoRenewing\": false,\r\n "
+// +" \"priceCurrencyCode\": \"\",\r\n  \"priceAmountMicros\": 10,\r\n"
+// +"  \"introductoryPriceInfo\": {\r\n    \"introductoryPriceCurrencyCode\": \"\",\r\n   "+
+// " \"introductoryPriceAmountMicros\": 10,\r\n    \"introductoryPricePeriod\": \"\",\r\n  "+
+// " \"introductoryPriceCycles\": 1\r\n  },\r\n  \"countryCode\": \"\",\r\n "+
+// " \"developerPayload\": \"\",\r\n  \"paymentState\": 1,\r\n "+
+// " \"cancelReason\": 1,\r\n  \"userCancellationTimeMillis\": "+d+",\r\n  "+
+// "\"cancelSurveyResult\": {\r\n    \"cancelSurveyReason\": 1,\r\n    "+
+// "\"userInputCancelReason\": \"\"\r\n  },\r\n  \"orderId\": \"\",\r\n  "+
+// "\"linkedPurchaseToken\": \"\",\r\n  \"purchaseType\": 1,\r\n  "+
+// "\"priceChange\": {\r\n    \"newPrice\": {\r\n      \"priceMicros\": \"\",\r\n "+
+// "\"currency\": \"\"\r\n    },\r\n    \"state\": 1\r\n  },\r\n "+
+// " \"profileName\": \"\",\r\n  \"emailAddress\": \"\",\r\n "+
+// " \"givenName\": \"\",\r\n  \"familyName\": \"\",\r\n  "+
+// "\"profileId\": \"\",\r\n  \"acknowledgementState\": 1\r\n}";
 module.exports = router;
