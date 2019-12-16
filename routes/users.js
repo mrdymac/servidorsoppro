@@ -2,8 +2,48 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var http = require('request');
+const keys = require('../path/to/api-4842214081322638001-491425-ae0051694b10.json');
 var packageName="com.mrdymac.sopro";
 /* GET users listing. */
+var google = require("googleapis");
+const {OAuth2Client} = require('google-auth-library');
+const {JWT} = require('google-auth-library');
+
+// storage
+//   .getBuckets()
+//   .then(results => {
+//     const buckets = results[0];
+
+//     console.log('Buckets:');
+//     buckets.forEach(bucket => {
+//       console.log(bucket.name);
+//     });
+//   })
+//   .catch(err => {
+//     console.error('ERROR:', err);
+//   });
+
+
+
+
+/**
+ * This example directly instantiates a Compute client to acquire credentials.
+ * Generally, you wouldn't directly create this class, rather call the
+ * `auth.getClient()` method to automatically obtain credentials.
+ */
+
+// const jwtClient = new JWT(
+//   keys.client_email,
+//   null,
+//   keys.private_key,
+//   "https://www.googleapis.com/auth/androidpublisher",
+//   null
+// );
+
+
+
+
+
 router.post("/signin",function(req,res){
   var db = require("../db");
   var e=req.body.email;
@@ -69,7 +109,7 @@ router.get('/plano', function(req, res, next) {
             http.get(url,(erro,retorno)=>{
               retorno=ret;
                 var json=JSON.parse(retorno);
-                var novaData=new Date(json.expiryTimeMillis);
+                var novaData=new Date(long.parse(json.expiryTimeMillis));
                 var h=new Date(hoje);
                 if (novaData>=new Date(hoje)){
                   
@@ -126,24 +166,49 @@ router.get('/plano', function(req, res, next) {
   );
   
 });
+var tok="";
+
+
+  // Generate the url that will be used for the consent dialog.
+//   const authorizeUrl = oAuth2Client.generateAuthUrl({
+//     access_type: 'offline',
+//     scope: 'https://www.googleapis.com/auth/androidpublisher',
+//  //   approval_prompt:'force',
+//     response_type:'code',
+//     login_hint:'sr.dyegomachado@gmail.com'
+//   });
+
 
 router.post('/plano/assina', function(req, res, next) {
   var db = require("../db");
+  var packageName= 'com.mrdymac.sopro';
   var ema=req.body.email;
   var plano=req.body.plano;  
-  var tok=req.body.token; 
+  var tok=req.body.token;
   var tokc=req.body.tokenCompra; 
   var idNot=req.body.idNotification; 
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
   //verifica na api do google ou ios apple a situacao da assinatura
- 
-  Planos.findOne({$or:[{codigo:plano},{idGooglePlay:plano}]}).lean().exec((e,p)=>{
-    var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+p.idGooglePlay+"/tokens/"+tokc+"?access_token="+tok;
+  //getToken(tokc,plano);
+  Planos.findOne({$or:[{codigo:plano},{idGooglePlay:plano}]}).lean().exec(async (e,p)=>{
+    var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+p.idGooglePlay+"/tokens/"+tokc;
+    const client = new JWT({    
+      project_id:keys.project_id,
+      email:keys.client_email,
+      key:keys.private_key,
+      scopes: ['https://www.googleapis.com/auth/androidpublisher']
+    });
+    
+   
+    //var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+subscriptionId+"/tokens/"+tokenCompra+"?";
+   await client.authorize((err, response) => {
+      
+      url+="?access_token="+response.access_token;
     http.get(url,(erro,retorno)=>{
-      retorno=ret;
-      var json=JSON.parse(retorno);
-      var novaData=new Date(json.expiryTimeMillis);
+   //   retorno=ret;
+      var json=JSON.parse(retorno.body);
+      var novaData=new Date(parseInt(json.expiryTimeMillis));
     if(p.codigo=='GRATIS')
       novaData=Date.now() + 100000 * 86400000;
     Users.findOneAndUpdate({email:ema, token:tok},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
@@ -169,6 +234,7 @@ router.post('/plano/assina', function(req, res, next) {
         }
       });
     });
+  });
   });
  
   
@@ -208,6 +274,50 @@ async function checaValidade(userPlano,  Model, plano) {
 
   
 }
+
+function getAuthenticatedClient() {
+  return new Promise((resolve, reject) => {
+    // create an oAuth client to authorize the API call.  Secrets are kept in a `keys.json` file,
+    // which should be downloaded from the Google Developers Console.
+   
+
+    //const r = oAuth2Client.getToken(code);
+    // Make sure to set the credentials on the OAuth2 client.
+    oAuth2Client.setCredentials(r.tokens);
+    console.info('Tokens acquired.');
+    // Open an http server to accept the oauth callback. In this simple example, the
+    // only request to our webserver is to /oauth2callback?code=<code>
+    // const server = http
+    //   .createServer(async (req, res) => {
+    //     try {
+    //       if (req.url.indexOf('/oauth2callback') > -1) {
+    //         // acquire the code from the querystring, and close the web server.
+    //         const qs = new url.URL(req.url, 'http://localhost:3000')
+    //           .searchParams;
+    //         const code = qs.get('code');
+    //         console.log(`Code is ${code}`);
+    //         res.end('Authentication successful! Please return to the console.');
+    //         server.destroy();
+
+    //         // Now that we have the code, use that to acquire tokens.
+    //         const r = await oAuth2Client.getToken(code);
+    //         // Make sure to set the credentials on the OAuth2 client.
+    //         oAuth2Client.setCredentials(r.tokens);
+    //         console.info('Tokens acquired.');
+    //         resolve(oAuth2Client);
+    //       }
+    //     } catch (e) {
+    //       reject(e);
+    //     }
+    //   })
+    //   .listen(3000, () => {
+    //     // open the browser to the authorize url to start the workflow
+    //     //opn(authorizeUrl, {wait: false}).then(cp => cp.unref());
+    //   });
+   // destroyer(server);
+  });
+}
+
 
 var d=Date.now() + 30 * 86400000;
 var ret="{\r\n  \"kind\": \"androidpublisher#subscriptionPurchase\","+
