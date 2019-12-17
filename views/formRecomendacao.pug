@@ -4,19 +4,19 @@ block content
     form(action="",method="POST")
         input(type="hidden", name="empresa",id="empresa", value=idEmpresa)
         //- input(type="hidden", name="dados_recomendacao")
-        label Recomendação
-        select(class="form-control",name="recomendacao", required=true)
+        label Recomendaçã
+        select(class="form-control",name="recomendacao",id="recomendacao", required=true)
             option(value="COMPRA") COMPRA
-            option(value="COMPRA") VENDA
-            option(value="COMPRA") NEUTRA
+            option(value="VENDA") VENDA
+            option(value="NEUTRA") NEUTRA
         label URL Podcast
-        input(type="Text",class="form-control",name="url", required=true)
+        input(type="Text",class="form-control",name="url",id="url", required=true)
         label Data
-        input(type="Text",class="form-control",name="data", required=true)
+        input(type="Text",class="form-control",name="data",id="data" required=true)
         label Ticker
-        input(type="Text",class="form-control",name="ticker", required=true)
+        input(type="Text",class="form-control",name="ticker",id="ticker" required=true)
         label Autor
-        input(type="Text",class="form-control",name="disclaimer", required=true)
+        input(type="Text",class="form-control",name="disclaimer",id="disclaimer" required=true)
         label Alvo         
         input(type="Text",class="form-control",name="values", id="alvo", required=true)
         label Texto
@@ -25,13 +25,46 @@ block content
     button(class="btn btn-primary", onclick="envia()") salvar
         
     script.
-        CKEDITOR.replace( 'texto' );
+        CKEDITOR.replace( 'texto' ,{
+            toolbarGroups :  [
+                { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+                { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+                { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+                { name: 'forms', groups: [ 'forms' ] },
+                '/',
+                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+                { name: 'links', groups: [ 'links' ] },
+                { name: 'insert', groups: [ 'insert' ] },
+                '/',
+                { name: 'styles', groups: [ 'styles' ] },
+                { name: 'colors', groups: [ 'colors' ] },
+                { name: 'tools', groups: [ 'tools' ] },
+                { name: 'others', groups: [ 'others' ] },
+                { name: 'about', groups: [ 'about' ] }
+            ]
+        });
         function envia(){
-            var bod=$('form').serialize();
-            bod+="&texto="+CKEDITOR.instances.texto.getData();;
-            bod+="&dados_recomendacao=[{\"label\":\"alvo\", \"values\":"+$('#alvo').val()+"}]";            
-            $.post("./save",bod,function(e){
+            //- var bod=
+            //- bod['texto']=CKEDITOR.instances.texto.getData();
+            //- bod['dados_recomendacao']=[{"label":"alvo", "values":$('#alvo').val()}] ;           
+           
+             $.ajax({
+                type: 'POST',
+                url: './save',
+                data: { "texto" : CKEDITOR.instances.texto.getData(), 
+                    "dados_recomendacao": "[{\"label\":\"alvo\", \"values\":"+$('#alvo').val()+"}]",
+                    "empresa":$("#empresa").val(),
+                    "recomendacao":$("#recomendacao").val(),
+                    "url":$("#url").val(),
+                    "data":$("#data").val(),
+                    "ticker":$("#ticker").val(),
+                    "disclaimer":$("#disclaimer").val()
+                    
+                    },
+                success: function(e){
                     document.location="/recomendacao/lista?empresa="+$("#empresa").val();
+                }
             });
         }
     
