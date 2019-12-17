@@ -110,7 +110,7 @@ router.get('/', function(req, res) {
          var lista=[];
          docs.forEach((f)=>{   
                 var index=0;
-                var validade=new Date(Date.now() );//- 86400000);
+                var validade=new Date(Date.now() - 86400000);
               
 
 
