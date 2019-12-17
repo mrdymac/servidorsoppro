@@ -1,6 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
+var http = require('request');
+const keys = require('../path/to/sopro-39ac3-1322717f5366.json');
+var packageName="com.mrdymac.sopro";
+/* GET users listing. */
+
+
+const {JWT} = require('google-auth-library');
 /* GET home page. */
 // router.get('/', function(req, res, next) {
 //   res.render('index', { title: 'Express' });
@@ -86,12 +93,14 @@ router.get('/', function(req, res) {
    var tok=req.query.token; 
    var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
     if(e==undefined ||e==""){
         res.status(200).send([]);
         return;
     }   
     let limit=10;
     var skip=limit *(pag-1);
+    
     Users.find({email:e,token:tok}).lean().exec(
       function (e, docs) {   
         if(docs[0]!=undefined && docs[0].idPlano==null){
@@ -101,7 +110,11 @@ router.get('/', function(req, res) {
          var lista=[];
          docs.forEach((f)=>{   
                 var index=0;
-                if(f.carteira.length>0)            
+                var validade=new Date(Date.now() );//- 86400000);
+              
+
+
+                if(f.carteira.length>0 )            
                 f.carteira.forEach((g)=>{                                        
                     Empresas.find({_id:g.id_empresa}).lean().exec(
                         function (s, em) {
@@ -128,16 +141,58 @@ router.get('/', function(req, res) {
                                 index++;
                                 if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
                                     lista.push(emp);
-                                if(f.carteira.length==index)                            
-                                    res.status(200).send(lista);  
+                                if(f.carteira.length==index){
+                                    if(f.validade.getTime()<validade.getTime()){
+
+                                        Planos.findOne({_id:f.idPlano}).lean().exec(async(erro,plan)=>{
+                        
+                                            if(plan.codigo!="GRATIS"){                                               
+                                                const client = new JWT({    
+                                                    project_id:keys.project_id,
+                                                    email:keys.client_email,
+                                                    key:keys.private_key,
+                                                    scopes: ['https://www.googleapis.com/auth/androidpublisher']
+                                                });
+                                                
+                                                var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plan.idGooglePlay+"/tokens/"+f.tokenCompra;
+                                                
+                                                await client.authorize((err, response) => {
+                                                    
+                                                    url+="?access_token="+response.access_token;
+                                                    http.get(url,(erro,retorno)=>{
+                                                        var json=JSON.parse(retorno.body);
+                                                        var novaData=parseInt(json.expiryTimeMillis);
+                                                        if (novaData>=validade.getTime()){                  
+                                                            Users.findOneAndUpdate({email:f.email},{idPlano:plan._id, validade:new Date(novaData)},function(e,u){
+                                                                res.status(200).send(lista);  
+                                                            });
+                                                        }else{
+                                                            Users.findOneAndUpdate({email:f.email},{idPlano:null, validade:null},function(e,u){
+                                                                res.status(200).send([{'status':'expirado'}]); 
+                                                            });
+                                                             
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                        });
+                                    
+                                        }else{
+                                            res.status(200).send(lista);
+                                        }
+                                }                            
+                                    
                             }else                          
                                 res.status(200).send([]);  
                             });
                         }
                     );                     
                 })
-                else
+                else{
+                    
                     res.status(200).send(lista);
+                }
+                    
             }
         );
         if(docs.length==0){

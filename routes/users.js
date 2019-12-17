@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var http = require('request');
-const keys = require('../path/to/api-4842214081322638001-491425-ae0051694b10.json');
+const keys = require('../path/to/sopro-39ac3-1322717f5366.json');
 var packageName="com.mrdymac.sopro";
 /* GET users listing. */
-var google = require("googleapis");
-const {OAuth2Client} = require('google-auth-library');
+
+
 const {JWT} = require('google-auth-library');
 
 // storage
@@ -58,7 +58,7 @@ router.post("/signin",function(req,res){
       }
       else {
           console.log("Post saved");
-        res.send([{id:u._id}]);
+        res.send([u]);
       }
   });
 });
@@ -97,20 +97,36 @@ router.get('/plano', function(req, res, next) {
       }
       
         if(b.idPlano!=null && b.idPlano!=undefined && b.idPlano!="" ){
-        Planos.findOne({_id:b.idPlano}).lean().exec((c,plano)=>{
+        Planos.findOne({_id:b.idPlano}).lean().exec(async (c,plano)=>{
          
           if(plano!=null){
             if(b.validade==null)
             return;
             
-            var hoje=Date.now();
+            var hoje=Date.now()-86400000;
             if(b.validade<new Date(hoje)){
-            var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plano.idGooglePlay+"/tokens/"+b.tokenCompra+"?access_token="+b.token;
-            http.get(url,(erro,retorno)=>{
-              retorno=ret;
-                var json=JSON.parse(retorno);
-                var novaData=new Date(long.parse(json.expiryTimeMillis));
-                var h=new Date(hoje);
+            
+            const client = new JWT({    
+              project_id:keys.project_id,
+              email:keys.client_email,
+              key:keys.private_key,
+              scopes: ['https://www.googleapis.com/auth/androidpublisher']
+            });
+            
+            var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plano.idGooglePlay+"/tokens/"+b.tokenCompra;
+            
+           await client.authorize((err, response) => {
+              
+              url+="?access_token="+response.access_token;
+              http.get(url,(erro,retorno)=>{
+                
+                if(b.codigo!='GRATIS'){
+                  var json=JSON.parse(retorno.body);
+                  var novaData=new Date(parseInt(json.expiryTimeMillis));
+                }else{
+                  novaData=Date.now() + 100000 * 86400000;
+                }
+               // var h=new Date(hoje);
                 if (novaData>=new Date(hoje)){
                   
                   Users.findOneAndUpdate({email:b.email},{idPlano:plano._id, validade:novaData},function(e,u){
@@ -143,7 +159,7 @@ router.get('/plano', function(req, res, next) {
                 })
                 
               });
-                  
+            });  
             }else{
               var p={
                 id:b.idPlano,
@@ -186,6 +202,8 @@ router.post('/plano/assina', function(req, res, next) {
   var plano=req.body.plano;  
   var tok=req.body.token;
   var tokc=req.body.tokenCompra; 
+  var planoAntigo=req.body.planoAntigo;  
+  var tokcAnt=req.body.tokenCompraAntigo;
   var idNot=req.body.idNotification; 
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
@@ -201,18 +219,27 @@ router.post('/plano/assina', function(req, res, next) {
     });
     
    
-    //var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+subscriptionId+"/tokens/"+tokenCompra+"?";
+    
    await client.authorize((err, response) => {
       
       url+="?access_token="+response.access_token;
+    
     http.get(url,(erro,retorno)=>{
    //   retorno=ret;
+   if(tokcAnt!=""&& tokcAnt!=undefined){
+     if(planoAntigo=="1000")
+      planoAntigo="ilimitado";
+      var url_cancel="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/empr._."+planoAntigo+"/tokens/"+tokcAnt+":cancel?access_token="+response.access_token;
+      http.post(url_cancel);
+    }  
+    if(p.codigo!='GRATIS'){
       var json=JSON.parse(retorno.body);
       var novaData=new Date(parseInt(json.expiryTimeMillis));
-    if(p.codigo=='GRATIS')
-      novaData=Date.now() + 100000 * 86400000;
+    }else{
+      novaData=new Date(Date.now() + 100000 * 86400000);
+    }
     Users.findOneAndUpdate({email:ema, token:tok},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
-      function (a,b){     
+              function (a,b){     
         if(a){
           return res.send([{'erro':'erro'}]);
         }else{
@@ -338,3 +365,4 @@ function getAuthenticatedClient() {
 // " \"givenName\": \"\",\r\n  \"familyName\": \"\",\r\n  "+
 // "\"profileId\": \"\",\r\n  \"acknowledgementState\": 1\r\n}";
 module.exports = router;
+
