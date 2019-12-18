@@ -137,7 +137,7 @@ router.post('/ticker/dividendos/save',function(req,res){
             {$set:{"dividendos.$.valor":parseFloat(val)}},
             
           function(err, doc){
-            console.log(doc);
+            //console.log(doc);
             if(doc==null)
             Tickers.findOneAndUpdate({
                 // _id:new mongo.ObjectId(id),
@@ -158,10 +158,10 @@ router.post('/ticker/dividendos/save',function(req,res){
 });
  //  });
  router.post('/ticker/cotacoes/save',function(req,res){
-    console.log(req.body.meta);
+  //  console.log(req.body.meta);
    //  if(req.body.meta!="havilandmosquito") 
    //  return res.status(401).send("não autorizado");
-    console.log(req.body.meta=="havilandmosquito");
+  //  console.log(req.body.meta=="havilandmosquito");
    var db = require("../db");
   // var id=req.body.empresa;
    var cod=req.body.codigo;
@@ -179,7 +179,7 @@ router.post('/ticker/dividendos/save',function(req,res){
             {$set:{"cotacoes.$.fechamento":parseFloat(val)}},
             
           function(err, doc){
-            console.log(doc);
+      //      console.log(doc);
             if(doc==null)
             Tickers.findOneAndUpdate({
                 // _id:new mongo.ObjectId(id),
@@ -200,7 +200,7 @@ router.post('/ticker/dividendos/save',function(req,res){
   });
 
   router.post('/ticker/alertas/save',function(req,res){
-   console.log(req.body.meta);
+   //console.log(req.body.meta);
    // if(req.body.meta!="havilandmosquito") 
    // return res.status(401).send("não autorizado");
 
@@ -275,7 +275,7 @@ router.post('/ticker/dividendos/save',function(req,res){
    var id = req.query.empresa;
    var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
    Tickers.findOne({idEmpresa:new mongo.ObjectId(id)},(err,doc)=>{
-         console.log(doc);
+      //   console.log(doc);
          if(err)
             return res.status(500).send([{'erro':'erro'}]);
          var lista=[];
@@ -364,7 +364,7 @@ router.get('/', function(req, res) {
                         
                         });
                      }
-                     console.log(users.carteira);
+                   //  console.log(users.carteira);
                      res.status(200).send(lista2);
                   }) 
              else 
