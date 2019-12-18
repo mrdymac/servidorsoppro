@@ -238,7 +238,7 @@ router.post('/plano/assina', function(req, res, next) {
     }else{
       novaData=new Date(Date.now() + 100000 * 86400000);
     }
-    Users.findOneAndUpdate({email:ema, token:tok},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
+    Users.findOneAndUpdate({email:ema},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
               function (a,b){     
         if(a){
           return res.send([{'erro':'erro'}]);
@@ -248,7 +248,7 @@ router.post('/plano/assina', function(req, res, next) {
               _id:new mongo.ObjectId(),
               idNotification: idNot,
               email:ema,
-              token: tok,
+              token: null,
               tokenCompra:tokc,              
               carteira: [] ,
               idPlano: p._id,
