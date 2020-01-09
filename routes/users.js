@@ -147,7 +147,7 @@ router.get('/plano', function(req, res, next) {
                   });
                 
                 }else
-                Users.findOneAndUpdate({email:b.email},{idPlano:null},function(e){
+                Users.findOneAndUpdate({email:b.email},{idPlano:null,carteira:[]},function(e){
                   if (e) {
                     console.log("Error! " + err.message);
                     res.send([]);  
