@@ -73,9 +73,14 @@ router.post('/publicar',function(req,res){
                 if(element._id != null && element._id.toString()==id && publicar){
                     element.dados_recomendacao.forEach((item)=>{                              
                         if(item.label.toLowerCase()=="alvo")
-                        alvo="alvo R$ "+getCurrencyMode(item.values);
+                        alvo="R$ "+getCurrencyMode(item.values);
                     });
-                    enviaNotificacao(t, element.ticker+"  "+alvo ,  element.recomendacao);
+                    var msg=element.recomendacao+" de "+element.ticker+" - preço alvo em "+alvo;
+                    if(element.recomendacao=="NEUTRA")
+                        msg="NEUTRA para "+element.ticker+" - alvo mantido em "+alvo;
+                    if(element.recomendacao=="VENDA")
+                        msg="VENDA de "+element.ticker+" - ação está acima do valor justo de "+alvo;
+                    enviaNotificacao(t, msg ,  "Nova Recomendação");
                 }
             });
             

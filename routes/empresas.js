@@ -263,7 +263,7 @@ router.post('/ticker/dividendos/save',function(req,res){
                                     recc="VENDA "+ti.codigo;
                                     msg="Alvo de "+getCurrencyMode(val)+" foi atingido.";
                                  }
-                                enviaNotificacao(listaNotification, msg ,  recc);
+                                enviaNotificacao(listaNotification, msg ,  "Trade Alert! "+recc);
                                res.send([{'ok':'saved'}]);
                             });
                         });
