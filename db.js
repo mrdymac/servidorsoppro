@@ -19,7 +19,8 @@ var empresasSchema = new mongoose.Schema({
     tickers:String,
     recomendacoes:Array,
     normalized:String,
-    setor_id:String
+    setor_id:String, 
+    idInvesting:String
 }, { collection: 'empresas' }
 );
 

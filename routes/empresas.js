@@ -2,7 +2,11 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 
- 
+
+var http = require('axios');
+const { JSDOM } = require( 'jsdom' );
+
+
 
 /* GET home page. */
 // router.get('/', function(req, res, next) {
@@ -22,8 +26,9 @@ router.post('/save',function(req,res){
    var n=req.body.nome;
    var tick=req.body.ticker;
    var lo=req.body.logo;
+   var idInvest=req.body.idInvesting;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
-   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[],normalized:n.toLowerCase(),tickers:tick});
+   var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[],normalized:n.toLowerCase(),tickers:tick,idInvesting:idInvest});
   
    var id=req.body.id;  
    if(id=="") 
@@ -38,7 +43,7 @@ router.post('/save',function(req,res){
       }
    });
    else  
-      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$set:{nome:n,logo:lo,tickers:tick,normalized:n.toLowerCase()}}).lean().exec((a,b)=>{
+      Empresas.findOneAndUpdate({_id:new mongo.ObjectId(id)},{$set:{nome:n,logo:lo,tickers:tick,normalized:n.toLowerCase(),idInvesting:idInvest}}).lean().exec((a,b)=>{
          res.redirect("/empresas?page=1&id="+empresa._id);
       });
    
@@ -375,17 +380,50 @@ router.get('/', function(req, res) {
 router.get('/cotacoes', function(req, res) {
    var db = require("../db");
    var lastid=req.query.id;  
+   
  //  var ticker=req.query.ticker;  
-   var Tickers = db.Mongoose.model('tickers', db.TickersSchema, 'tickers');
-   Tickers.find({idEmpresa:new mongo.ObjectId(lastid)},{cotacoes:1}).lean().exec(
-      function (e, docs) { 
-       var lista=docs[0].cotacoes;
+   var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   Empresas.findOne({_id:new mongo.ObjectId(lastid)}).lean().exec(
+      function (e, empr) {
+         var idInvesting=empr.idInvesting;
+         var dataIni=new Date(Date.now() - 180 * 86400000).toISOString().substr(0,10);
+         dataIni=dataIni.substr(8,2)+"/"+dataIni.substr(5,2)+"/"+dataIni.substr(0,4);
+         var dataFim= new Date(Date.now()).toISOString().substr(0,10);
+         dataFim=dataFim.substr(8,2)+"/"+dataFim.substr(5,2)+"/"+dataFim.substr(0,4);
+         const data = "curr_id="+idInvesting+"&smlID=1166714&header=PRIO3&st_date="+dataIni+"&end_date="+dataFim+"&"+
+         "interval_sec=Daily&sort_col=date&sort_ord=DESC&action=historical_data";        
+         const options = {
+            headers: {
+               'Host':'br.investing.com',
+               'Accept': '*/*',
+               'Accept-Encoding': 'gzip, deflate, br',             
+               'Content-Type': 'application/x-www-form-urlencoded', 
+               'Connection': 'keep-alive',
+               "Cache-Control":"no-cache",
+               "Cookie":'ses_id=deleted; PHPSESSID=n0ctur4patjbjkj2rs047366sf; StickySession=id.34756005100.401.br.investing.com; geoC=BR; adBlockerNewUserDomains=1578678782; nyxDorf=ODw%2FZDRlZiQyYGp4ZjM2Mz9wNG40Nzcz',
+               "Content-Length":                Buffer.byteLength(data),
+               "User-Agent": "PostmanRuntime/7.21.0",   
+               'Postman-Token':'2bf677c3-aa6c-4def-85ff-02bc768b85cd',
+               "X-Requested-With": "XMLHttpRequest"
+             },
+            method:"POST"
+          };
+          var lista=[];
+      http.post("https://br.investing.com/instruments/HistoricalDataAjax",data,options).then((resp) => {
+         lista=call_jsdom(resp.data);
+         
+           lista.forEach(element => {
+             element.data=getDataFormatada(element.data);              
+           });
           
-       lista.forEach(element => {
-           element.data=getDataFormatada(element.data);
-       });
-         res.status(200).send(lista);               
-        });
+          res.status(200).send(lista);               
+         }).catch((error) => {
+            if( error.response ){
+               res.status(200).send([]); // => the response payload 
+            }
+        });;
+      });        
+   
 });
 
 router.get('/cotacoes/ultima', function(req, res) {
@@ -496,6 +534,37 @@ function enviaNotificacao(tokens, msg, title){
          }
       
      })
+}
+
+function call_jsdom(source, callback) {
+    var jsdom = new JSDOM( source );
+
+   // Set window and document from jsdom
+   var { window } = jsdom;
+  // var { document } = window;
+   // Also set global window and document before requiring jQuery
+
+   var $ =  require( 'jquery' )(window);
+   var retorno = [];
+   $("#results_box > table > tbody > tr").each(function (index,val){
+      var data=$($(val).find("td")[0]).html();
+      data=data.replace(".","").replace(".","").replace(".","");
+      data=data.substr(4,4)+data.substr(2,2)+data.substr(0,2);
+      var valor= $($(val).find("td")[1]).html();
+      valor=valor.replace(",",".");
+      retorno.push({_id:0,data:data,fechamento:parseFloat(valor)})
+      console.log(retorno[index]);      
+   });
+   var listaOrdenada=retorno.sort((a,b)=>{
+      if ( a.data < b.data ){
+          return -1;
+        }
+        if ( a.data > b.data ){
+          return 1;
+        }
+        return 0;
+  });
+   return listaOrdenada;
 }
 module.exports = router;
 
