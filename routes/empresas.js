@@ -411,11 +411,11 @@ router.get('/cotacoes', function(req, res) {
           var lista=[];
       http.post("https://br.investing.com/instruments/HistoricalDataAjax",data,options).then((resp) => {
          lista=call_jsdom(resp.data);
-         
+           
            lista.forEach(element => {
              element.data=getDataFormatada(element.data);              
            });
-          
+          lista.pop();
           res.status(200).send(lista);               
          }).catch((error) => {
             if( error.response ){
@@ -553,7 +553,7 @@ function call_jsdom(source, callback) {
       var valor= $($(val).find("td")[1]).html();
       valor=valor.replace(",",".");
       retorno.push({_id:0,data:data,fechamento:parseFloat(valor)})
-      console.log(retorno[index]);      
+      //console.log(retorno[index]);      
    });
    var listaOrdenada=retorno.sort((a,b)=>{
       if ( a.data < b.data ){
