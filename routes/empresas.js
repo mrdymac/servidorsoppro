@@ -391,7 +391,7 @@ router.get('/cotacoes', function(req, res) {
          var dataFim= new Date(Date.now()).toISOString().substr(0,10);
          dataFim=dataFim.substr(8,2)+"/"+dataFim.substr(5,2)+"/"+dataFim.substr(0,4);
          const data = "curr_id="+idInvesting+"&smlID=1166714&header=PRIO3&st_date="+dataIni+"&end_date="+dataFim+"&"+
-         "interval_sec=Daily&sort_col=date&sort_ord=DESC&action=historical_data";        
+         "interval_sec=Weekly&sort_col=date&sort_ord=DESC&action=historical_data";        
          const options = {
             headers: {
                'Host':'br.investing.com',
