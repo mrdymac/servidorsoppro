@@ -484,7 +484,7 @@ router.get('/editar/:id', function(req, res) {
    var id=req.params.id;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
    Empresas.findOne({_id:new mongo.ObjectId(id)}).lean().exec((a,b)=>{
-         res.send({id:id,nome:b.nome,url:b.logo,tickers:b.tickers});
+         res.send({id:id,nome:b.nome,url:b.logo,tickers:b.tickers,idInvesting:b.idInvesting});
    });   
 });
 
