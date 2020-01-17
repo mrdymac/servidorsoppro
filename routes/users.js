@@ -328,9 +328,9 @@ router.post("/cadastro/save",function(req,res){
           if(idIndicacao!=""){
             var destino={
               from:"noreply.soppro@gmail.com",
-              to:"sr.dyegomachado@gmail.com",
+              to:user.email,
               subject:"Soppro",
-              text:"http://localhost:3000/users/confirma?id="+user._id+"&ind="+idIndicacao
+              text:"https://soppro.herokuapp.com/users/confirma?id="+user._id+"&ind="+idIndicacao
             }
             remetente.sendMail(destino,(error)=>{
                 if(error)
@@ -417,7 +417,7 @@ router.post("/cadastro/enviarsenha",function(req,res){
         from:"noreply.soppro@gmail.com",
         to:email,
         subject:"Soppro",
-        text:"http://localhost:3000/users/cadastro/alterarsenha?token="+u.token+"&id="+u._id.toString()
+        text:"https://soppro.herokuapp.com/users/cadastro/alterarsenha?token="+u.token+"&id="+u._id.toString()
       }
       remetente.sendMail(destino,(error)=>{
           if(error){
