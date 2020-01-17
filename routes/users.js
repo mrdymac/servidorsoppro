@@ -113,7 +113,10 @@ router.get('/plano', function(req, res, next) {
               key:keys.private_key,
               scopes: ['https://www.googleapis.com/auth/androidpublisher']
             });
-            
+            if(b.tokenCompra==""){
+              res.send([]); 
+              return;
+            }
             var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plano.idGooglePlay+"/tokens/"+b.tokenCompra;
             
            await client.authorize((err, response) => {
@@ -263,7 +266,7 @@ router.post('/plano/assina', function(req, res, next) {
             return res.send([{'ok':'saved'}]);
           }else{
             if(b.carteira.length>numEmpPlano){              
-              Users.findOneAndUpdate({email:ema},{$set:{carteira:b.carteira.limit(numEmpPlano)}}).lean().exec();              
+              Users.findOneAndUpdate({email:ema},{$set:{carteira:b.carteira.slice(0,numEmpPlano)}}).lean().exec();              
             }
             return res.send([{'ok':'saved'}]);
           }

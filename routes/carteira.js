@@ -150,7 +150,7 @@ router.get('/', function(req, res) {
                                                         key:keys.private_key,
                                                         scopes: ['https://www.googleapis.com/auth/androidpublisher']
                                                     });
-                                                    if(tokenCompra==""){
+                                                    if(f.tokenCompra==""){
                                                         res.status(200).send([{'status':'expirado'}]);
                                                         return ;
                                                     }
@@ -174,6 +174,9 @@ router.get('/', function(req, res) {
                                                             }
                                                         });
                                                     });
+                                                } else{
+                                                    res.status(200).send([{'status':'expirado'}]);
+                                                 
                                                 }
                                             });
                                         
