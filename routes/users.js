@@ -3,11 +3,15 @@ var router = express.Router();
 var mongo = require('mongodb');
 var http = require('request');
 var mailer = require('nodemailer');
+var crypto = require('crypto');
 const keys = require('../path/to/api-4842214081322638001-491425-ae0051694b10.json');
 var packageName="com.mrdymac.sopro";
 /* GET users listing. */
 
-
+var remetente=mailer.createTransport({host:"imap.gmail.com",service:"imap.gmail.com",port:465,secure:true,auth:{
+  user:"noreply.soppro@gmail.com",
+  pass:"Curtisp40!@#"
+}});
 const {JWT} = require('google-auth-library');
 
 // storage
@@ -318,10 +322,7 @@ router.post("/cadastro/save",function(req,res){
             ind_confirmado:false
           });
           user.save();
-          var remetente=mailer.createTransport({host:"imap.gmail.com",service:"imap.gmail.com",port:465,secure:true,auth:{
-            user:"noreply.soppro@gmail.com",
-            pass:"Curtisp40!@#"
-          }});
+         
          
           console.log("Post saved");
           if(idIndicacao!=""){
@@ -388,16 +389,82 @@ router.get("/confirma",function(req,res){
 });
 router.post("/login",function(req,res){
   var db = require("../db");
-  var email=req.body.user;  
+  var email=req.body.user.trim();  
   var pass=req.body.pass;  
   
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   Users.findOne({"email":email,"senha":pass},function(err,user){
+    var name = user._id+Date.now()+"supersecretmrdymac!@#$%¨&*(";
+    var hash = crypto.createHash('md5').update(name).digest('hex');
     if(user)
-        res.send("[{\"ok\":\"success\"}]");
+        res.send("[{\"ok\":\"success\",\"email\":\""+email+"\",\"token\":\""+hash+"\"}]");
     else 
         res.send("[{\"invalid\":\"invalido\"}]");
   });
+});
+router.get("/esquecisenha",function(req,res){    
+    res.render("esquecisenha");
+});
+router.post("/cadastro/enviarsenha",function(req,res){  
+  var db = require("../db");
+  var email=req.body.email; 
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.findOne({email:email},function(e,u){
+    if(u){
+      var destino={
+        from:"noreply.soppro@gmail.com",
+        to:email,
+        subject:"Soppro",
+        text:"http://localhost:3000/users/cadastro/alterarsenha?token="+u.token+"&id="+u._id.toString()
+      }
+      remetente.sendMail(destino,(error)=>{
+          if(error){
+            console.log(error);
+            res.send("[{\"error\":\"erro\"}]");
+          }
+          else {
+            console.log("email enviado");
+            res.send("[{\"email\":\""+email+"\"}]");
+          }
+      });
+    }else{
+       res.send("[{\"notFound\":\"inexistente\"}]");
+    }
+      
+  });
+  
+});
+router.get("/emailEnviado",function(req,res){    
+  res.render("emailEnviado",{email:req.query.email});
+});
+router.get("/cadastro/alterarsenha",function(req,res){   
+  var db = require("../db");
+  var token=req.query.token;  
+  var id=req.query.id;
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.findOne({_id:new mongo.ObjectID(id),token:token},function(e,u){
+    if(u)
+      res.render("alterarsenha",{id:id});
+    else
+      res.render("linkquebrado");
+  });
+});
+router.post("/cadastro/alterarsenha",function(req,res){    
+  var db = require("../db");
+  var pass=req.body.pass;  
+  var id=req.body.id;
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.findOneAndUpdate({_id:new mongo.ObjectID(id)},{senha:pass},function(err,u){
+    if(err)
+      res.send("[{\"error\":\"error\"}]");
+    else if(u)
+      res.send("[{\"ok\":\"ok\"}]");
+    else
+      res.send("[{\"error\":\"error\"}]");
+  });
+});
+router.get("/cadastro/senhaalterada",function(req,res){    
+  res.render("senhaalterada",{email:req.query.email});
 });
 function hojeToString(){
  var data = new Date(Date.now());

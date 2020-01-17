@@ -1,0 +1,44 @@
+extends layout
+block content        
+    div
+        h1 Alterar Senha
+        form(id="dados")
+            input(type="hidden",class="form-control",name="id",id="id",value=id)
+            label Senha:
+            input(type="password",class="form-control",name="pass",id="pass")
+            label Confirmação de senha:
+            input(type="password",class="form-control",name="passConfirm",id="passConfirm")
+        button(value="Salvar",class="btn btn-primary",style="margin-top:10px",onClick="salvar()") Alterar
+    script.
+        function salvar(){
+             if($("#passConfirm").val()!=$("#pass").val()){
+                    alert("Senhas não conferem!");
+                    return false;
+            }           
+            if(confirm("Confirmar?")){
+                $.blockUI({message:"<h1>Alterando...</h1>"});
+                $.post('./alterarsenha',$("#dados").serialize(),function(data,status) {
+                    console.log(data);
+                        var retorno=$.parseJSON(data);                        
+                        $.unblockUI();
+                           
+                        if(retorno[0].ok!=undefined)
+                            document.location="./senhaalterada";
+                        else
+                            alert("Erro! Não foi possível alterar a senha");
+                });
+            }            
+            
+        }
+        function validateEmail(email) {
+                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
+        }
+
+        
+
+        
+       
+        
+
+            
