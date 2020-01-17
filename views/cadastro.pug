@@ -1,0 +1,34 @@
+extends layout
+block content        
+    div(class="shadow p-3 mb-5 bg-white rounded")
+        h1 Novo Usuario
+        form(id="dados")        
+            input(type="hidden",class="form-control",name="idIndicacao",id="idIndicacao",value=idIndicacao)
+            label E-mail:
+            input(type="text",class="form-control",name="email",id="email")
+            label Senha:
+            input(type="password",class="form-control",name="pass",id="pass")
+            label Confirmação de senha:
+            input(type="password",class="form-control",name="passConfirm",id="passConfirm")
+        button(value="Salvar",class="btn btn-primary",style="margin-top:10px",onClick="salvar()") Cadastrar
+    script.
+        function salvar(){
+             if($("#passConfirm").val()!=$("#pass").val()){
+                    alert("Senhas não conferem!");
+                    return false;
+                }
+            if(confirm("Confirmar?"))
+                $.post('./cadastro/save',$("#dados").serialize(),function(data,status) {
+                    console.log(data);
+                        var retorno=$.parseJSON(data);
+                        if(retorno[0].found!=undefined)
+                            alert("Usuário já cadastrado");
+                        if(retorno[0].ok!=undefined)
+                            document.location="./sucess";
+                });            
+            
+        }
+       
+        
+
+            

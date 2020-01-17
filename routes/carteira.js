@@ -111,9 +111,6 @@ router.get('/', function(req, res) {
          docs.forEach((f)=>{   
                 var index=0;
                 var validade=new Date(Date.now() - 86400000);
-              
-
-
                 if(f.carteira.length>0 )            
                 f.carteira.forEach((g)=>{                                        
                     Empresas.find({_id:g.id_empresa}).lean().exec(
@@ -124,67 +121,70 @@ router.get('/', function(req, res) {
                             Tickers.find({idEmpresa:new mongo.ObjectId(g.id_empresa)},{cotacoes:1}).lean().exec(
                                function (e, tick) { 
                                    if(tick.length>0){
-                                var emp={
-                                    id:g.id_empresa, 
-                                    nome: em[0].nome,
-                                    logo:em[0].logo,
-                                    cotacao_atual:getCurrencyMode(getUltimaCotacao(tick[0])),
-                                    ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
-                                    ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
-                                    atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
-                                    normalized: em[0].normalized,
-                                    inicio_acompanhamento:g.inicio_acomp,
-                                    preco_entrada:getCurrencyMode(g.preco_entrada),
-                                    tickers:em[0].tickers,
-                                    alertar:g.alertar
-                                };
-                                index++;
-                                if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
-                                    lista.push(emp);
-                                if(f.carteira.length==index){
-                                    if(f.validade.getTime()<validade.getTime()){
+                                    var emp={
+                                        id:g.id_empresa, 
+                                        nome: em[0].nome,
+                                        logo:em[0].logo,
+                                        cotacao_atual:getCurrencyMode(getUltimaCotacao(tick[0])),
+                                        ultimo_recomendacao:getUltimaRecomendacao(em[0])==undefined?"":getUltimaRecomendacao(em[0]).recomendacao,
+                                        ultimo_alvo:getUltimaRecomendacao(em[0])==undefined?"":getCurrencyMode(getUltimoAlvo(getUltimaRecomendacao(em[0]))),
+                                        atualizacao:getUltimaRecomendacao(em[0])==undefined?"":getDataFormatada(getUltimaRecomendacao(em[0]).data), 
+                                        normalized: em[0].normalized,
+                                        inicio_acompanhamento:g.inicio_acomp,
+                                        preco_entrada:getCurrencyMode(g.preco_entrada),
+                                        tickers:em[0].tickers,
+                                        alertar:g.alertar
+                                        };
+                                    index++;
+                                    if(index>skip && (name==undefined || emp.normalized.includes(name.toLowerCase())  || name==""))
+                                        lista.push(emp);
+                                    if(f.carteira.length==index){
+                                        if(f.validade.getTime()<validade.getTime()){
 
-                                        Planos.findOne({_id:f.idPlano}).lean().exec(async(erro,plan)=>{
-                        
-                                            if(plan.codigo!="GRATIS"){                                               
-                                                const client = new JWT({    
-                                                    project_id:keys.project_id,
-                                                    email:keys.client_email,
-                                                    key:keys.private_key,
-                                                    scopes: ['https://www.googleapis.com/auth/androidpublisher']
-                                                });
-                                                
-                                                var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plan.idGooglePlay+"/tokens/"+f.tokenCompra;
-                                                
-                                                await client.authorize((err, response) => {
-                                                    
-                                                    url+="?access_token="+response.access_token;
-                                                    http.get(url,(erro,retorno)=>{
-                                                        var json=JSON.parse(retorno.body);
-                                                        var novaData=parseInt(json.expiryTimeMillis);
-                                                        if (novaData>=validade.getTime()){                  
-                                                            Users.findOneAndUpdate({email:f.email},{idPlano:plan._id, validade:new Date(novaData)},function(e,u){
-                                                                res.status(200).send(lista);  
-                                                            });
-                                                        }else{
-                                                            Users.findOneAndUpdate({email:f.email},{idPlano:null, validade:null},function(e,u){
-                                                                res.status(200).send([{'status':'expirado'}]); 
-                                                            });
-                                                             
-                                                        }
+                                            Planos.findOne({_id:f.idPlano}).lean().exec(async(erro,plan)=>{
+                            
+                                                if(plan.codigo!="GRATIS"){                                               
+                                                    const client = new JWT({    
+                                                        project_id:keys.project_id,
+                                                        email:keys.client_email,
+                                                        key:keys.private_key,
+                                                        scopes: ['https://www.googleapis.com/auth/androidpublisher']
                                                     });
-                                                });
+                                                    if(tokenCompra==""){
+                                                        res.status(200).send([{'status':'expirado'}]);
+                                                        return ;
+                                                    }
+                                                    var url="https://www.googleapis.com/androidpublisher/v3/applications/"+packageName+"/purchases/subscriptions/"+plan.idGooglePlay+"/tokens/"+f.tokenCompra;
+                                                    
+                                                    await client.authorize((err, response) => {
+                                                        
+                                                        url+="?access_token="+response.access_token;
+                                                        http.get(url,(erro,retorno)=>{
+                                                            var json=JSON.parse(retorno.body);
+                                                            var novaData=parseInt(json.expiryTimeMillis);
+                                                            if (novaData>=validade.getTime()){                  
+                                                                Users.findOneAndUpdate({email:f.email},{idPlano:plan._id, validade:new Date(novaData)},function(e,u){
+                                                                    res.status(200).send(lista);  
+                                                                });
+                                                            }else{
+                                                                Users.findOneAndUpdate({email:f.email},{idPlano:null, validade:null},function(e,u){
+                                                                    res.status(200).send([{'status':'expirado'}]); 
+                                                                });
+                                                                
+                                                            }
+                                                        });
+                                                    });
+                                                }
+                                            });
+                                        
+                                            }else{
+                                                res.status(200).send(lista);
                                             }
-                                        });
+                                        }                            
                                     
-                                        }else{
-                                            res.status(200).send(lista);
-                                        }
-                                }                            
-                                    
-                            }else                          
-                                res.status(200).send([]);  
-                            });
+                                    }else                          
+                                        res.status(200).send([]);  
+                                    });
                         }
                     );                     
                 })

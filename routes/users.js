@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var http = require('request');
+var mailer = require('nodemailer');
 const keys = require('../path/to/api-4842214081322638001-491425-ae0051694b10.json');
 var packageName="com.mrdymac.sopro";
 /* GET users listing. */
@@ -147,16 +148,16 @@ router.get('/plano', function(req, res, next) {
                   });
                 
                 }else
-                Users.findOneAndUpdate({email:b.email},{idPlano:null,carteira:[]},function(e){
-                  if (e) {
-                    console.log("Error! " + err.message);
-                    res.send([]);  
-                  }
-                  else {
-                      console.log("Post saved"); 
-                      res.send([]);  
-                  }
-                })
+                    Users.findOneAndUpdate({email:b.email},{idPlano:null},function(e){
+                      if (e) {
+                        console.log("Error! " + err.message);
+                        res.send([]);  
+                      }
+                      else {
+                          console.log("Post saved"); 
+                          res.send([]);  
+                      }
+                    });
                 
               });
             });  
@@ -238,7 +239,9 @@ router.post('/plano/assina', function(req, res, next) {
     }else{
       novaData=new Date(Date.now() + 100000 * 86400000);
     }
-    Users.findOneAndUpdate({email:ema},{$set:{idPlano:p._id,validade:novaData,tokenCompra:tokc}}).lean().exec(
+    var dados={idPlano:p._id,validade:novaData,tokenCompra:tokc};
+    var numEmpPlano=p.num_empresas;
+    Users.findOneAndUpdate({email:ema},{$set:dados}).lean().exec(
               function (a,b){     
         if(a){
           return res.send([{'erro':'erro'}]);
@@ -252,12 +255,18 @@ router.post('/plano/assina', function(req, res, next) {
               tokenCompra:tokc,              
               carteira: [] ,
               idPlano: p._id,
-              validade: novaData              
+              validade: novaData ,
+              n_indicacoes:0,
+              ind_confirmado:false          
             });
             user.save();
             return res.send([{'ok':'saved'}]);
-          }else
-          return res.send([{'ok':'saved'}]);
+          }else{
+            if(b.carteira.length>numEmpPlano){              
+              Users.findOneAndUpdate({email:ema},{$set:{carteira:b.carteira.limit(numEmpPlano)}}).lean().exec();              
+            }
+            return res.send([{'ok':'saved'}]);
+          }
         }
       });
     });
@@ -265,6 +274,127 @@ router.post('/plano/assina', function(req, res, next) {
   });
  
   
+});
+router.get("/cadastro",function(req,res){
+  var db = require("../db");
+  var idIndicacao=req.query.id;
+ if (idIndicacao==null)
+    idIndicacao="";
+  
+        res.render('cadastro',{idIndicacao:idIndicacao});
+      
+  
+});
+
+router.post("/cadastro/save",function(req,res){
+  var db = require("../db");
+  var email=req.body.email;
+  var idIndicacao=req.body.idIndicacao;
+  var senha=req.body.pass;  
+  var confirmacao=req.body.passConfirm;
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.find({"email":email},function(err,user){
+    if(err || email==""){
+         res.send("[{\"error\":\"erro\"}]");
+         return err;
+    }
+    if (user.length>0) {
+        res.send("[{\"found\":\"userFound\"}]");          
+     }
+    else {
+          var user= new Users({
+            _id:new mongo.ObjectId(),        
+            email:email,
+            senha:senha,
+            n_indicacoes:0,
+            token: null,
+            tokenCompra:null,              
+            carteira: [] ,
+            idPlano:null,
+            validade:null,
+            ind_confirmado:false
+          });
+          user.save();
+          var remetente=mailer.createTransport({host:"imap.gmail.com",service:"imap.gmail.com",port:465,secure:true,auth:{
+            user:"noreply.soppro@gmail.com",
+            pass:"Curtisp40!@#"
+          }});
+         
+          console.log("Post saved");
+          if(idIndicacao!=""){
+            var destino={
+              from:"noreply.soppro@gmail.com",
+              to:"sr.dyegomachado@gmail.com",
+              subject:"Soppro",
+              text:"http://localhost:3000/users/confirma?id="+user._id+"&ind="+idIndicacao
+            }
+            remetente.sendMail(destino,(error)=>{
+                if(error)
+                  console.log(error);
+                else 
+                  console.log("email enviado");
+            });
+          }
+          res.send("[{\"ok\":\"saved\"}]"); //,\"email\":\""+email+"\",\"token\":\"\"
+      }
+  });
+});
+router.get("/sucess",function(req,res){
+  res.render("sucess",{emailUser:req.query.user})
+});
+router.get("/confirma",function(req,res){
+  var db = require("../db");
+  var id=req.query.id;  
+  var ind=req.query.ind; 
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  var Planos = db.Mongoose.model('planos', db.PlanoSchema, 'planos');
+  Users.findOneAndUpdate({_id:new mongo.ObjectId(id),ind_confirmado:false},{ind_confirmado:true},function(err,u){
+    if(u){
+      Users.findOne({_id:new mongo.ObjectId(ind)},function(errr,uind){
+        if(uind){
+          uind.n_indicacoes=uind.n_indicacoes+1;
+          if(uind.n_indicacoes>1){
+            Planos.find({$or:[{codigo:"EMPR5"},{codigo:"GRATIS"}]},(erp,p)=>{
+              var planoUser=p[0]._id.toString();
+              if(uind.idPlano!=null && uind.idPlano==p[1]._id.toString())
+                planoUser=p[1]._id.toString();
+              var plano5=p[0];
+              
+              if(plano5.codigo!="EMPR5")
+                plano5=p[1];
+              var  novaData=Date.now() + 30 * 86400000;
+              if(uind.idPlano==null || planoUser.codigo=="GRATIS")
+              Users.findOneAndUpdate({_id:new mongo.ObjectId(ind)},{n_indicacoes:0,validade:novaData,idPlano:plano5._id.toString()},(erind,uindd)=>{
+                if(uindd)
+                  console.log("att");
+              });
+            });            
+          }else{
+            Users.findOneAndUpdate({_id:new mongo.ObjectId(ind)},{n_indicacoes:uind.n_indicacoes},(erind,uindd)=>{
+              if(uindd)
+                console.log("att");
+            });
+          }
+        }
+      });
+    }
+    
+  });
+
+  res.render("sucess",{emailUser:req.query.user})
+});
+router.post("/login",function(req,res){
+  var db = require("../db");
+  var email=req.body.user;  
+  var pass=req.body.pass;  
+  
+  var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
+  Users.findOne({"email":email,"senha":pass},function(err,user){
+    if(user)
+        res.send("[{\"ok\":\"success\"}]");
+    else 
+        res.send("[{\"invalid\":\"invalido\"}]");
+  });
 });
 function hojeToString(){
  var data = new Date(Date.now());

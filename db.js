@@ -34,7 +34,10 @@ var usersSchema = new mongoose.Schema({
    carteira: Array ,
    idPlano: String,
    validade: Date,
-   normalized: String
+   normalized: String,
+   n_indicacoes: Number,
+   senha: String,
+   ind_confirmado:Boolean
 }, { collection: 'users' }
 );
 var planoSchema=new mongoose.Schema({
