@@ -357,7 +357,7 @@ router.get("/confirma",function(req,res){
       Users.findOne({_id:new mongo.ObjectId(ind)},function(errr,uind){
         if(uind){
           uind.n_indicacoes=uind.n_indicacoes+1;
-          if(uind.n_indicacoes>1){
+          if(uind.n_indicacoes>4){
             Planos.find({$or:[{codigo:"EMPR5"},{codigo:"GRATIS"}]},(erp,p)=>{
               var planoUser=p[0]._id.toString();
               if(uind.idPlano!=null && uind.idPlano==p[1]._id.toString())
@@ -394,10 +394,12 @@ router.post("/login",function(req,res){
   
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   Users.findOne({"email":email,"senha":pass},function(err,user){
-    var name = user._id+Date.now()+"supersecretmrdymac!@#$%¨&*(";
-    var hash = crypto.createHash('md5').update(name).digest('hex');
-    if(user)
-        res.send("[{\"ok\":\"success\",\"email\":\""+email+"\",\"token\":\""+hash+"\"}]");
+    
+    if(user){
+      var name = user._id+Date.now()+"supersecretmrdymac!@#$%¨&*(";
+      var hash = crypto.createHash('md5').update(name).digest('hex');
+      res.send("[{\"ok\":\"success\",\"email\":\""+email+"\",\"token\":\""+hash+"\"}]");
+    }
     else 
         res.send("[{\"invalid\":\"invalido\"}]");
   });
