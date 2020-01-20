@@ -67,7 +67,9 @@ router.post('/publicar',function(req,res){
         Users.find({"carteira.id_empresa":rec._id}).lean().exec(function (errr,users){
             var t=[];
             users.forEach((user)=>{
-                t.push(user.idNotification);
+                var hoje=Date.now();
+                if(user.validade>=new Date(hoje))
+                    t.push(user.idNotification);
             });
             rec.recomendacoes.forEach(element => {
                 if(element._id != null && element._id.toString()==id && publicar){

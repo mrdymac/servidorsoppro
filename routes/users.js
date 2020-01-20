@@ -51,7 +51,7 @@ const {JWT} = require('google-auth-library');
 
 router.post("/signin",function(req,res){
   var db = require("../db");
-  var e=req.body.email;
+  var e=req.body.email.toLowerCase();
   var tok=req.body.token;
   var idNot=req.body.idNotification;
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
@@ -69,7 +69,7 @@ router.post("/signin",function(req,res){
 });
 router.post("/save",function(req,res){
   var db = require("../db");
-  var e=req.body.email;
+  var e=req.body.email.toLowerCase();
   var tok=req.body.token;
   var idNot=req.body.idNotification;
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
@@ -206,7 +206,7 @@ var tok="";
 router.post('/plano/assina', function(req, res, next) {
   var db = require("../db");
   var packageName= 'com.mrdymac.sopro';
-  var ema=req.body.email;
+  var ema=req.body.email.toLowerCase();
   var plano=req.body.plano;  
   var tok=req.body.token;
   var tokc=req.body.tokenCompra; 
@@ -295,7 +295,7 @@ router.get("/cadastro",function(req,res){
 
 router.post("/cadastro/save",function(req,res){
   var db = require("../db");
-  var email=req.body.email;
+  var email=req.body.email.toLowerCase();
   var idIndicacao=req.body.idIndicacao;
   var senha=req.body.pass;  
   var confirmacao=req.body.passConfirm;
@@ -393,7 +393,7 @@ router.post("/login",function(req,res){
   var pass=req.body.pass;  
   
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
-  Users.findOne({"email":email,"senha":pass},function(err,user){
+  Users.findOne({"email":email.toLowerCase(),"senha":pass},function(err,user){
     
     if(user){
       var name = user._id+Date.now()+"supersecretmrdymac!@#$%¨&*(";
@@ -409,7 +409,7 @@ router.get("/esquecisenha",function(req,res){
 });
 router.post("/cadastro/enviarsenha",function(req,res){  
   var db = require("../db");
-  var email=req.body.email; 
+  var email=req.body.email.toLowerCase(); 
   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
   Users.findOne({email:email},function(e,u){
     if(u){

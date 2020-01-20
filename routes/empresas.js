@@ -28,6 +28,7 @@ router.post('/save',function(req,res){
    var lo=req.body.logo;
    var idInvest=req.body.idInvesting;
    var Empresas = db.Mongoose.model('empresas', db.EmpresasSchema, 'empresas');
+   var Users = db.Mongoose.model('users', db.UsersSchema, 'users');
    var empresa=new Empresas({_id:new mongo.ObjectID(),nome:n,logo:lo,recomendacoes:[],normalized:n.toLowerCase(),tickers:tick,idInvesting:idInvest});
   
    var id=req.body.id;  
@@ -39,6 +40,17 @@ router.post('/save',function(req,res){
       }
       else {
           console.log("Post saved");
+          var hoje=Date.now();
+          Users.find({validade:{$gte:new Date(hoje)}}).lean().exec(function (errr,users){
+            var listaNotification=[];
+            users.forEach((user)=>{
+               if(user.idNotification!=null && user.idNotification!="")
+                   listaNotification.push(user.idNotification);
+            });
+            if(listaNotification.length>0)
+            enviaNotificacao(listaNotification,"Iniciamos a cobertura de "+n,"Nova empresa inserida")
+         });
+          
         res.redirect("/empresas?page=1&id="+empresa._id);
       }
    });
@@ -243,7 +255,9 @@ router.post('/ticker/dividendos/save',function(req,res){
                             Users.find({"carteira.id_empresa":rec._id,"carteira.alertar":true}).lean().exec(function (errr,users){
                                 var listaNotification=[];
                                 users.forEach((user)=>{
-                                    listaNotification.push(user.idNotification);
+                                    var hoje=Date.now();
+                                    if(user.validade>=new Date(hoje))
+                                       listaNotification.push(user.idNotification);
                                 }); 
                                 if(listaNotification.length==0)
                                     return res.send("{'ok':'sem usuarios'}");
@@ -526,14 +540,24 @@ function enviaNotificacao(tokens, msg, title){
          body : msg
        }
      };
-     db.FCM.sendToMultipleToken(message, tokens, function(err, response) {
-         if(err){
-             console.log('err--', err);
-         }else {
-             console.log('response-----', response);
-         }
+   // if(tokens=="all")
+   //    db.FCM.send(message, function(err, response) {
+   //       if(err){
+   //          console.log('err--', err);
+   //       }else {
+   //          console.log('response-----', response);
+   //       }
       
-     })
+   //       });
+   // else
+      db.FCM.sendToMultipleToken(message, tokens, function(err, response) {
+            if(err){
+               console.log('err--', err);
+            }else {
+               console.log('response-----', response);
+            }
+         
+      });
 }
 
 function call_jsdom(source, callback) {
