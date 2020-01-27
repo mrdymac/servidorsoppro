@@ -8,12 +8,20 @@ router.get("/",(req,res)=>{
 });
 
 router.post("/",(req,res)=>{
-    
+    var db = require("../db");
     var user=req.body.user;
-    var senha=req.body.senha;
-    if(user=="mrdymac" && senha=="Curtisp40!@#")
-        req.session.curtisp="f4ucorsair";
-    res.redirect("/empresas/lista");
+    var pass=req.body.senha;
+    var Admin = db.Mongoose.model('admin', db.AdminSchema, 'admin');
+    Admin.findOne({login:user,senha:pass}).lean().exec((err,u)=>{
+        if(u)        {
+            req.session.curtisp="f4ucorsair";
+            res.redirect("/empresas/lista");
+        }
+        else
+            res.redirect("/login");
+    });
+    
+    
 });
 
 module.exports = router;

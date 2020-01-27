@@ -8,8 +8,7 @@ var  fcm = require ('fcm-notification') ;
 var Fcm = new fcm ('./path/to/privatekkey.json') ;
 var adminSchema = new mongoose.Schema({
     login: String,
-    senha: String,
-    token: String
+    senha: String    
 }, { collection: 'admin' }
 );
 
@@ -75,5 +74,5 @@ var googleSchema=new mongoose.Schema(
 
 module.exports = { Mongoose: mongoose, 
     EmpresasSchema: empresasSchema, UsersSchema:usersSchema, 
-    PlanoSchema: planoSchema, TickersSchema:tickersSchema, GoogleSchema:googleSchema,
+    PlanoSchema: planoSchema, TickersSchema:tickersSchema, GoogleSchema:googleSchema, AdminSchema:adminSchema,
     FCM:Fcm } 
