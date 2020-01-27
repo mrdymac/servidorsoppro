@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 // mongoose.connect('mongodb://adminmongo:Curtisp40@mongo_soprodb:27017/soprodb');
-//  mongoose.connect('mongodb://adminmongo:Curtisp40@kamino.mongodb.umbler.com:45553/soprodb');
- mongoose.connect("mongodb+srv://adminmongo:Curtisp40@cluster0-qwok3.gcp.mongodb.net/soprodb?retryWrites=true&w=majority");
+//  mongoose.connect('mongodb://adminmongo:Curtisp40@kamino.mongodb.umbler.com:45553/soprodb');mongodb+srv://adminmongo:<password>@cluster0-qwok3.gcp.mongodb.net/test
+ mongoose.connect("mongodb+srv://adminmongo:f4ucorsair@cluster0-qwok3.gcp.mongodb.net/soprodb?retryWrites=true&w=majority");
 const Schema = mongoose.Schema;
 var  fcm = require ('fcm-notification') ; 
 var Fcm = new fcm ('./path/to/privatekkey.json') ;
@@ -55,7 +55,24 @@ var tickersSchema=new mongoose.Schema({
     dividendos: [{data:String, valor: Number}]
 },{collection:'tickers'}
 );
+
+var googleSchema=new mongoose.Schema(
+    {
+        type: String,
+        project_id: String,
+        private_key_id: String,
+        private_key: String,
+        client_email: String,
+        client_id: String,
+        auth_uri: String,
+        token_uri: String,
+        auth_provider_x509_cert_url:String,
+        client_x509_cert_url: String
+      }
+,{collection:'google'}
+);
+
 module.exports = { Mongoose: mongoose, 
     EmpresasSchema: empresasSchema, UsersSchema:usersSchema, 
-    PlanoSchema: planoSchema, TickersSchema:tickersSchema,
+    PlanoSchema: planoSchema, TickersSchema:tickersSchema, GoogleSchema:googleSchema,
     FCM:Fcm } 
