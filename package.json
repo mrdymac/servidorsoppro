@@ -16,7 +16,7 @@
     "fcm-notification": "^2.0.0",
     "fs": "0.0.1-security",
     "http-errors": "~1.6.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jsdom": "^15.2.1",
     "mongodb": "^3.3.4",
     "mongoose": "^5.7.11",
